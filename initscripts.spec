@@ -3,7 +3,7 @@ Name: initscripts
 Version: 7.57
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 2
 Source: initscripts-%{version}.tar.bz2
 URL: http://rhlinux.redhat.com/initscripts/
 Patch0: initscripts-s390.patch
@@ -249,6 +249,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
+- rebuilt
+
 * Tue May 25 2004 Bill Nottingham <notting@redhat.com> 7.57-1
 - readonly root fixes (<alexl@redhat.com>)
 
