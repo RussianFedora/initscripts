@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.74
+Version: 7.75
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -56,7 +56,6 @@ popd
 %ifnarch s390 s390x
 rm -f \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-ctc \
- $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-escon \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv
 %else
 rm -f \
@@ -103,56 +102,11 @@ fi
 
 %triggerun -- initscripts <= 7.59
 /sbin/chkconfig --del random
+exit 0
 
 %triggerun -- initscripts < 7.62
 /sbin/chkconfig --del rawdevices
-
-%triggerpostun -- initscripts <= 5.04
-/sbin/chkconfig --add netfs
-/sbin/chkconfig --add network
-
-%triggerpostun -- initscripts <= 4.72
-
-. /etc/sysconfig/init
-. /etc/sysconfig/network
-
-# These are the non-default settings. By putting them at the end
-# of the /etc/sysctl.conf file, it will override the default
-# settings earlier in the file.
-
-if [ -n "$FORWARD_IPV4" -a "$FORWARD_IPV4" != "no" -a "$FORWARD_IPV4" != "false" ]; then
-	echo "# added by initscripts install on `date`" >> /etc/sysctl.conf
-	echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-fi
-
-newnet=`mktemp /etc/sysconfig/network.XXXXXX`
-if [ -n "$newnet" ]; then
-  sed "s|FORWARD_IPV4.*|# FORWARD_IPV4 removed; see /etc/sysctl.conf|g" \
-   /etc/sysconfig/network > $newnet
-  sed "s|DEFRAG_IPV4.*|# DEFRAG_IPV4 removed; obsolete in 2.4. kernel|g" \
-   $newnet > /etc/sysconfig/network
-  rm -f $newnet
-fi
-
-if [ -n "$MAGIC_SYSRQ" -a "$MAGIC_SYSRQ" != "no" ]; then
-	echo "# added by initscripts install on `date`" >> /etc/sysctl.conf
-	echo "kernel.sysrq = 1" >> /etc/sysctl.conf
-fi
-if uname -m | grep -q sparc ; then
-   if [ -n "$STOP_A" -a "$STOP_A" != "no" ]; then
-	echo "# added by initscripts install on `date`" >> /etc/sysctl.conf
-	echo "kernel.stop-a = 1" >> /etc/sysctl.conf
-   fi
-fi
-
-newinit=`mktemp /etc/sysconfig/init.XXXXXX`
-if [ -n "$newinit" ]; then
-  sed "s|MAGIC_SYSRQ.*|# MAGIC_SYSRQ removed; see /etc/sysctl.conf|g" \
-   /etc/sysconfig/init > $newinit
-  sed "s|STOP_A.*|# STOP_A removed; see /etc/sysctl.conf|g" \
-   $newinit > /etc/sysconfig/init
-  rm -f $newinit
-fi
+exit 0
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -201,7 +155,6 @@ rm -rf $RPM_BUILD_ROOT
 /etc/sysconfig/network-scripts/ifdown-isdn
 %ifarch s390 s390x
 %config /etc/sysconfig/network-scripts/ifup-ctc
-%config /etc/sysconfig/network-scripts/ifup-escon
 %config /etc/sysconfig/network-scripts/ifup-iucv
 %endif
 %config /etc/X11/prefdm
@@ -252,6 +205,10 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 7.75-1 
+- fix sysfs configuration of qeth and lcs network interfaces
+  (eth, tr, hsi)
+
 * Mon Aug 30 2004 Karsten Hopp <karsten@redhat.de> 7.74-1 
 - fix support for LCS portnumbers (mainframe)
 
