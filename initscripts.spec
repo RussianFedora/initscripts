@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.54
+Version: 7.57
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -17,7 +17,7 @@ Requires: bash >= 2.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2
-Conflicts: kernel <= 2.4, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
+Conflicts: kernel <= 2.4, timeconfig < 3.0, ppp < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils, sh-utils
@@ -249,6 +249,22 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue May 25 2004 Bill Nottingham <notting@redhat.com> 7.57-1
+- readonly root fixes (<alexl@redhat.com>)
+
+* Tue May 25 2004 Karsten Hopp <karsten@redhat.de> 7.56-1 
+- special TYPE for qeth devices to differenciate them from ethX
+
+* Mon May 24 2004 Bill Nottingham <notting@redhat.com>
+- fix pppd vs. ppp typo in conflicts (#123680)
+
+* Fri May 21 2004 Bill Nottingham <notting@redhat.com>
+- fix bridging confusing module order (#122848, <luto@myrealbox.com>)
+- rc.d/rc.sysinit: don't mount cifs (#122501)
+
+* Tue May 18 2004 Karsten Hopp <karsten@redhat.de> 7.55-1 
+- add support for ccwgroup devices on mainframe
+
 * Thu May 13 2004 Than Ngo <than@redhat.com> 7.54-1
 - add patch to enable PIE build of usernetctl
 
