@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 6.67
+Version: 7.13
 License: GPL
 Group: System Environment/Base
-Release: 1a
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://rhlinux.redhat.com/initscripts/
 Patch0: initscripts-s390.patch
@@ -12,15 +12,15 @@ Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, sysklogd >= 1.3.31
 Requires: setup >= 2.0.3, /sbin/fuser, which, /bin/grep
 Requires: modutils >= 2.3.11-5
-Requires: util-linux >= 2.10s-11, mount >= 2.11g-5
+Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 2.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
-Requires: /sbin/update
-Conflicts: kernel <= 2.2, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
-Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12
+Requires: /etc/redhat-release, dev
+Conflicts: kernel <= 2.4, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
+Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-21
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils, sh-utils
-BuildPrereq: glib-devel popt
+BuildPrereq: glib2-devel popt gettext pkgconfig
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -50,13 +50,16 @@ for foo in * ; do
 done
 popd
 
-pushd  %{buildroot}/etc/locale
-for foo in * ; do
-	echo "%lang($foo) /etc/locale/$foo/*/*" >> \
-	$RPM_BUILD_DIR/%{name}-%{version}/trans.list
-done
-popd
-
+%ifnarch s390 s390x
+rm -f \
+ $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-ctc \
+ $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-escon \
+ $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv
+%else
+rm -f \
+ $RPM_BUILD_ROOT/etc/rc.d/rc.sysinit.s390init \
+ $RPM_BUILD_ROOT/etc/sysconfig/init.s390
+%endif
 
 %pre
 /usr/sbin/groupadd -g 22 -r -f utmp
@@ -185,6 +188,7 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-sit
 %config /etc/sysconfig/network-scripts/ifdown-sit
 %config /etc/sysconfig/network-scripts/ifup-aliases
+%config /etc/sysconfig/network-scripts/ifdown-aliases
 %config /etc/sysconfig/network-scripts/ifup-ippp
 %config /etc/sysconfig/network-scripts/ifdown-ippp
 %config /etc/sysconfig/network-scripts/ifup-wireless
@@ -196,7 +200,7 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-iucv
 %endif
 %config /etc/X11/prefdm
-%config /etc/inittab
+%config(noreplace) /etc/inittab
 %dir /etc/rc.d
 %dir /etc/rc.d/rc[0-9].d
 %config(missingok) /etc/rc.d/rc[0-9].d/*
@@ -229,6 +233,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man*/*
 %dir %attr(775,root,root) /var/run/netreport
 %dir /etc/ppp
+%dir /etc/ppp/peers
 %config /etc/ppp/ip-up
 %config /etc/ppp/ip-down
 %config /etc/ppp/ip-up.ipv6to4
@@ -239,11 +244,201 @@ rm -rf $RPM_BUILD_ROOT
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
-%dir /etc/locale
-%dir /etc/locale/*
-%dir /etc/locale/*/LC_MESSAGES
 
 %changelog
+* Tue Feb 25 2003 Bill Nottingham <notting@redhat.com> 7.13-1
+- handle 7.x SYSFONTACM settings in setsysfont (#84183)
+
+* Mon Feb 24 2003 Bill Nottingham <notting@redhat.com> 7.12-1
+- handle changed chain name
+- init vts used in all cases
+
+* Fri Feb 21 2003 Bill Nottingham <notting@redhat.com> 7.10-1
+- handle LANGUAGE specially for zh_CN.GB18030 and gdm (#84773)
+
+* Thu Feb 20 2003 Bill Nottingham <notting@redhat.com> 7.09-1
+- initialize two ttys past # of mingettys (for GDM)
+- fix zeroconf route
+- redhat-config-network writes $NAME.route for some static routes
+  (e.g., ppp); handle that (#84193)
+
+* Tue Feb 18 2003 Bill Nottingham <notting@redhat.com> 7.08-1
+- load keybdev & mousedev even if hid is already loaded/static
+- run fewer scripts through action (#49670, #75279, #81531)
+
+* Mon Feb 10 2003 Bill Nottingham <notting@redhat.com> 7.07-1
+- fix nicknames & profiles (#82246)
+- fix check_device_down (#83780, <pzb@datstacks.com>)
+- vlan fixes (<tis@foobar.fi>)
+- fix groff macros (#83531, <tsekine@sdri.co.jp>)
+- various updated translations
+- fix checkpid for multiple pids (#83401)
+
+* Fri Jan 31 2003 Bill Nottingham <notting@redhat.com> 7.06-1
+- 802.1Q VLAN support (<tis@foobar.fi>, #82593)
+- update translations
+
+* Thu Jan 30 2003 Bill Nottingham <notting@redhat.com> 7.05-1
+- fix syntax error in rc.sysinit when there are fsck errors
+- fix zh_TW display on console (#82235)
+
+* Wed Jan 15 2003 Bill Nottingham <notting@redhat.com> 7.04-1
+- tweak some translatable strings
+- fix for rc.sysinit on machines that pass arguments to mingetty
+  (<nalin@redhat.com>)
+
+* Tue Jan 14 2003 Bill Nottingham <notting@redhat.com> 7.03-1
+- move system font setting sooner (<milan.kerslager@pslib.cz>)
+- fix link checking for dhcp, use both ethtool and mii-tool
+- fix CJK text on the console, and locale-archive held open
+  on shutdown
+- IPv6 updates <pekkas@netcore.fi>, <pb@bieringer.de>
+- speedup tweaks (<drepper@redhat.com>)
+- use glib2 for ppp-watch (#78690, <kisch@mindless.com>)
+- add zeroconf route (#81738)
+- fix ifup-ppp for dial-on-demand, and onboot (<goeran@uddeborg.pp.se>)
+- tweak raidtab parsing, don't worry about not-in-fstab RAID devices
+  (#71087, #78467, <aja@mit.edu>)
+- don't automatically bring up aliases if 'ONPARENT=no' is set (#78992)
+- getkey cleanups/tweaks (#76071, <ben@enchantedforest.org>)
+- rework halt_get_remaining (#76831, <michal@harddata.com>)
+- ipcalc: fix calculation of /32 addresses (#76646)
+- various other tweaks and fixes
+
+* Fri Dec 20 2002 Bill Nottingham <notting@redhat.com> 7.01-1
+- %%config(noreplace) inittab
+
+* Tue Dec 17 2002 Nalin Dahyabhai <nalin@redhat.com>
+- add a "nofirewire" option to /etc/rc.sysinit, analogous to "nousb"
+
+* Tue Dec 17 2002 Bill Nottingham <notting@redhat.com> 7.00-1
+- tweaks for potential GUI bootup
+- loop checking for network link state, don't unilterally wait five
+  seconds
+
+* Fri Dec 14 2002 Karsten Hopp <karsten@redhat.de> 6.99-1
+- remove call to /sbin/update for S/390, too
+
+* Wed Dec 11 2002 Bill Nottingham <notting@redhat.com> 6.98-1
+- remove call to /sbin/update
+- fix netprofile
+
+* Mon Dec  2 2002 Bill Nottingham <notting@redhat.com> 6.97-1
+- IPv6 update (<pekkas@netcore.fi>, <pb@bieringer.de>)
+- devlabel support (<Gary_Lerhaupt@Dell.com>)
+- do lazy NFS umounts
+
+* Tue Nov 19 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- correctly remove non-packaged files for mainframe
+
+* Tue Nov 12 2002 Bill Nottingham <notting@redhat.com> 6.96-1
+- fix various static-routes brokeness (#74317, #74318, #74320, #76619,
+  #75604)
+- fix handling of SYSFONTACM in setsysfont (#75662)
+- fix lang.csh for CJK (#76908, <ynakai@redhat.com>)
+- IPv6 update (<pekkas@netcore.fi>, <pb@bieringer.de>)
+- other minor tweaks
+
+* Mon Sep 16 2002 Than Ngo <than@redhat.com>
+- owns directory /etc/ppp/peers (bug #74037)
+
+* Wed Sep  4 2002 Bill Nottingham <notting@redhat.com> 6.95-1
+- fix syntax error in duplicate route removal section of ifup
+
+* Wed Sep  4 2002 Nalin Dahyabhai <nalin@redhat.com> 6.94-1
+- fix syntax error calling unicode_start when SYSFONTACM isn't set
+
+* Mon Sep  2 2002 Bill Nottingham <notting@redhat.com>
+- fix calling of unicode_start in lang.{sh,csh}
+- ipv6 tweak
+
+* Wed Aug 28 2002 Bill Nottingham <notting@redhat.com>
+- don't infinite loop on ifdown
+- remove disabling of DMA; this can cause problems
+- move swap startup to after LVM (#66588)
+
+* Tue Aug 20 2002 Bill Nottingham <notting@redhat.com>
+- don't cycle through eth0-eth9 on dhcp link check (#68127)
+- don't retry indefinitely on ppp startup
+- activate network profile passed on kernel commandline via netprofile=
+- fix iptables invocations again
+- translation refresh
+
+* Wed Aug 14 2002 Bill Nottingham <notting@redhat.com>
+- fix silly typo in rc.sysinit
+- increase timeout for link to 5 seconds (#70545)
+
+* Tue Aug 13 2002 Bill Nottingham <notting@redhat.com>
+- require /etc/redhat-release (#68903)
+- fix tty2-tty6 (sort of)
+- fix iptables invocations (#70807, #71201, #68368)
+- other minor tweaks
+
+* Wed Jul 24 2002 Bill Nottingham <notting@redhat.com>
+- fix unicode checks in rc.sysinit, lang.{sh,csh} to handle UTF-8@euro
+
+* Tue Jul 16 2002 Bill Nottingham <notting@redhat.com>
+- use iptables, not ipchains
+
+* Tue Jul 16 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- /sbin/service: set PATH before calling startup scripts
+  HOME and TERM are also set during bootup, but they should not make
+  a difference for well-written daemons.
+
+* Mon Jul 15 2002 Bill Nottingham <notting@redhat.com>
+- fix boot-time cleanup of /var
+- update po files
+
+* Thu Jul 11 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- /etc/init.d/functions:
+	daemon(): avoid starting another bash
+	killproc(): avoid starting another bash for the default case
+- do not call "insmod -p" before loading the "st" module
+
+* Tue Jul 09 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- allow an option for ups poweroff  #68123
+- change grep for ONBOOT=  #63903
+- allow building with a cross-compiler  #64362,#64255
+- faster check in network-functions:check_default_route()
+- better checks for backup files
+- drastically reduce the number of consoletype invocations
+- do not export "GATEWAY" in network-functions
+- code cleanups in rc.sysinit
+
+* Fri Jul 05 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- rc.sysinit: do not load raid modules unless /etc/raidtab exists
+- many cleanups for more consistent shell programming and also
+  many smaller speedups within network scripts, no un-necessary sourcing
+  of files etc
+- nearly re-code /etc/rc.d/rc
+
+* Thu Jun 27 2002 Bill Nottingham <notting@redhat.com>
+- a couple minor unicode tweaks in rc.sysinit
+
+* Wed Jun 26 2002 Bill Nottingham <notting@redhat.com>
+- move /proc/bus/usb mount, in case USB is in the initrd
+
+* Wed Jun 26 2002 Preston Brown <pbrown@redhat.com>
+- don't try to set wireless freq/channel when in Managed mode
+
+* Wed Jun 26 2002 Florian La Roche <Florian.LaRoche@redhat.de>
+- start some sh coding cleanups
+- change to /etc/init.d/functions
+- eliminate some un-necessary PATH settings
+- eliminate some TEXTDOMAIN settings
+
+* Wed Jun 12 2002 Bill Nottingham <notting@redhat.com> 6.78-1
+- fix UTF-8 checks
+
+* Wed Jun 05 2002 Than Ngo <than@redhat.com> 6.77-1
+- fixed a bug in setting defaultgateway
+
+* Thu May 30 2002 Bill Nottingham <notting@redhat.com> 6.76-1
+- call unicode_start in lang.{sh,csh}, setsysfont when necessary
+
+* Tue May 28 2002 Bill Nottingham <notting@redhat.com> 6.75-1
+- add check for link for dhcp back in
+
 * Fri Apr 19 2002 Bill Nottingham <notting@redhat.com> 6.67-1
 - fix silly cut&paste bug in hdparm settings in initscripts
 
