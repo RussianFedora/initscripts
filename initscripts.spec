@@ -1,21 +1,23 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 6.40.1
+Version: 6.65
 License: GPL
 Group: System Environment/Base
 Release: 1
 Source: initscripts-%{version}.tar.bz2
+URL: http://rhlinux.redhat.com/initscripts/
 Patch0: initscripts-s390.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
-Requires: procps >= 2.0.7-7, sysklogd >= 1.3.31
+Requires: /sbin/sysctl, sysklogd >= 1.3.31
 Requires: setup >= 2.0.3, /sbin/fuser, which, /bin/grep
 Requires: modutils >= 2.3.11-5
 Requires: util-linux >= 2.10s-11, mount >= 2.11g-5
 Requires: bash >= 2.0, SysVinit
-Requires: /sbin/ip, /sbin/arping
+Requires: /sbin/ip, /sbin/arping, net-tools
+Requires: /sbin/update
 Conflicts: kernel <= 2.2, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
-Conflicts: ypbind < 1.6-12
+Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils, sh-utils
 BuildPrereq: glib-devel popt
@@ -23,8 +25,9 @@ BuildPrereq: glib-devel popt
 %description
 The initscripts package contains the basic system scripts used to boot
 your Red Hat system, change runlevels, and shut the system down
-cleanly. Initscripts also contains the scripts that activate and
+cleanly.  Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
+
 
 %prep
 %setup -q
@@ -168,6 +171,7 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/network-functions-ipv6
 %config /etc/sysconfig/network-scripts/init.ipv6-global
 %config /etc/sysconfig/network-scripts/ifcfg-lo
+%config /etc/sysconfig/network-scripts/ifup-ipx
 %config /etc/sysconfig/network-scripts/ifup-post
 %config /etc/sysconfig/network-scripts/ifdown-ppp
 %config /etc/sysconfig/network-scripts/ifdown-sl
@@ -229,8 +233,10 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ip-down
 %config /etc/ppp/ip-up.ipv6to4
 %config /etc/ppp/ip-down.ipv6to4
+%config /etc/ppp/ipv6-up
+%config /etc/ppp/ipv6-down
 %config /etc/initlog.conf
-%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto
+%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 %dir /etc/locale
@@ -238,9 +244,83 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/locale/*/LC_MESSAGES
 
 %changelog
-* Wed Sep 25 2001 Bill Nottingham <notting@redhat.com>
-- flush all relevant addresses on ifdown (<pbrown@redhat.com>, #53531, #53704)
-- don't umount initrd on partitionless systems (#53509)
+* Mon Apr 15 2002 Trond Eivind Glomsrød <teg@redhat.com> 6.65-1
+- Update translations
+
+* Sun Apr 14 2002 Bill Nottingham <notting@redhat.com> 6.64-1
+- make sure chatdbg is set before using it (#63448, <Bertil@Askelid.com>)
+- allow tweaking of more devices with hdparm (#53511), and
+  tweak non-disk devices iff they explicitly have a config file
+  for that device (#56575, #63415)
+- some translation updates
+
+* Fri Apr 12 2002 Bill Nottingham <notting@redhat.com> 6.63-1
+- ipcalc cleanups (#58410)
+- quit stripping binaries
+- do LVM init after RAID init too (#63238)
+- export all locale variables (#56142)
+- run sysctl -p after network init as well
+
+* Tue Apr 09 2002 Bill Nottingham <notting@redhat.com> 6.62-1
+- delete X/VNC locks on startup (#63035)
+- shut up DMA disabling, move it to after ide-scsi (#62873, #62956)
+- use full path to /sbin/ifconfig (#59457)
+- /sbin/service: change to root directory before staring/stopping;
+  also sanitize environment
+		
+* Tue Apr 02 2002 Bill Nottingham <notting@redhat.com> 6.61-1
+- when disabling DMA, don't use things in /usr
+
+* Thu Mar 28 2002 Bill Nottingham <notting@redhat.com> 6.60-1
+- disable DMA on CD-ROMs at bootup
+
+* Wed Mar 27 2002 Bill Nottingham <notting@redhat.com> 6.59-1
+- add local hook to halt
+
+* Fri Mar 15 2002 Than Ngo <than@redhat.com> 6.58-1
+- fix usernetctl for working with neat
+
+* Thu Mar 14 2002 Bill Nottingham <notting@redhat.com> 6.57-1
+- update translations
+
+* Tue Mar 12 2002 Bill Nottingham <notting@redhat.com> 6.56-1
+- use nameif for interfaces where we don't agree on HWADDR with the
+  config file (<harald@redhat.com>)
+- LSB support tweaks
+
+* Tue Mar 12 2002 Mike A. Harris  <mharris@redhat.com> 6.55-1
+- Removed process accounting stuff from rc.sysinit and halt scripts as it is
+  now handled by the psacct initscript in the psacct package
+
+* Thu Feb 28 2002 Bill Nottingham <notting@redhat.com>
+- conflict with older psacct
+
+* Fri Feb 22 2002 Bill Nottingham <notting@redhat.com>
+- fix invocation of need_hostname (#58946), a couple other minor tweaks
+
+* Tue Feb 12 2002 Mike A. Harris  <mharris@redhat.com>
+- rc.sysinit: changed /var/log/pacct to /var/account/pacct for FHS 2.2 compliance
+
+* Wed Jan 30 2002 Bill Nottingham <notting@redhat.com>
+- run /bin/setfont, not /usr/bin/setfont (kbd)
+- lots-o-random bugfixes/tweaks (see ChangeLog)
+
+* Thu Jan 17 2002 Michael K. Johnson <johnsonm@redhat.com>
+- Added support for libredhat-kernel.so.* symlink handling
+
+* Wed Nov  7 2001 Than Ngo <than@redhat.com>
+- fix bug in setting netmask on s390/s390x (bug #55421)
+  nmbd daemon works now ;-)
+
+* Fri Nov  2 2001 Than Ngo <than@redhat.com>
+- fixed typo bug ifup-ippp
+
+* Mon Oct 29 2001 Than Ngo <than@redhat.com>
+- fix bug in channel bundling if MSN is missed
+- support DEBUG option
+	
+* Wed Sep 19 2001 Than Ngo <than@redhat.com>
+- don't show user name by DSL connection
 
 * Sat Sep  8 2001 Bill Nottingham <notting@redhat.com>
 - don't run hwclock --adjust on a read-only filesystem
