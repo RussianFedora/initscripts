@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 6.24
+Version: 6.26
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -238,6 +238,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/locale/*/LC_MESSAGES
 
 %changelog
+* Wed Aug 22 2001 Bill Nottingham <notting@redhat.com>
+- fix ifup-wireless (#52135)
+
+* Wed Aug 22 2001 Than Ngo <than@redhat.com>
+- fix return code of isdnctrl (bug #52225)
+
 * Tue Aug 21 2001 Than Ngo <than@redhat.com>
 - fix Bringing up isdn device again. It works now correct.
 
