@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.59
+Version: 7.60
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -17,6 +17,7 @@ Requires: bash >= 2.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2
+Conflicts: mkinitrd < 4.0
 Conflicts: kernel <= 2.4, timeconfig < 3.0, ppp < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Obsoletes: rhsound sapinit
@@ -71,10 +72,9 @@ touch /var/run/utmp
 chown root:utmp /var/log/wtmp /var/run/utmp
 chmod 664 /var/log/wtmp /var/run/utmp
 
-chkconfig --add random 
-chkconfig --add netfs 
-chkconfig --add network 
-chkconfig --add rawdevices
+/sbin/chkconfig --add netfs 
+/sbin/chkconfig --add network 
+/sbin/chkconfig --add rawdevices
 
 # handle serial installs semi gracefully
 if [ $1 = 0 ]; then
@@ -97,14 +97,15 @@ fi
 
 %preun
 if [ $1 = 0 ]; then
-  chkconfig --del random
-  chkconfig --del netfs
-  chkconfig --del network
-  chkconfig --del rawdevices
+  /sbin/chkconfig --del netfs
+  /sbin/chkconfig --del network
+  /sbin/chkconfig --del rawdevices
 fi
 
+%triggerun -- initscripts <= 7.59
+/sbin/chkconfig --del random
+
 %triggerpostun -- initscripts <= 5.04
-/sbin/chkconfig --add random
 /sbin/chkconfig --add netfs
 /sbin/chkconfig --add network
 
@@ -249,6 +250,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Aug 03 2004 Karsten Hopp <karsten@redhat.de> 7.60-1 
+- write peerid into sysfs for IUCV devices (mainframe)
+
 * Fri Jul  2 2004 Bill Nottingham <notting@redhat.com> 7.59-1
 - set context on ICE directory after making it (#127099, <concert@europe.com>)
 - don't mount GFS filesystems in rc.sysinit
