@@ -1,10 +1,13 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 5.84.1
+Version: 5.85
 Copyright: GPL
 Group: System Environment/Base
-Release: 1
-Source: initscripts-%{version}.tar.bz2
+Release: 1.71.2sx
+Source: initscripts-%{version}.tar.gz
+Patch0: initscripts-s390x.patch
+Patch1: initscripts-5.85-backport5841.patch
+Patch2: initscripts-s390x-2.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: procps >= 2.0.7-7, sysklogd >= 1.3.31
@@ -27,6 +30,10 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
+%patch0 -p1
+%patch1 -p1
+%patch2 -p1
+chmod 755 sysconfig/network-scripts/ifup-escon
 
 %build
 make
@@ -213,6 +220,8 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-ipx
 %ifarch s390 s390x
 %config /etc/sysconfig/network-scripts/ifup-ctc
+%config /etc/sysconfig/network-scripts/ifup-escon
+%config /etc/sysconfig/network-scripts/ifup-iucv
 %endif
 %config /etc/X11/prefdm
 %config /etc/inittab
@@ -255,17 +264,26 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Fri Sep 21 2001 Bill Nottingham <notting@redhat.com>
-- backport some fixes from the 7.2 branch:
-- unmounting of loopback devices
-- unmounting of /initrd
-- don't blow up on ext3/reiserfs in /etc/init.d/halt
+* Fri Feb 15 2002 Phil Knirsch <pknirsch@redhat.com>
+- Added fixes for oco handling and ifup-ctc
+- Added ifup-escon.
 
-* Wed Sep  5 2001 Preston Brown <pbrown@redhat.com>
-- quota changes
+* Wed Jan 30 2002 David Sainty <dsainty@redhat.com> 5.85-1.71.1sx
+- add in valid patches from 5.84.1-1 7.1 backport
+
+* Wed Apr 25 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- add further s390 changes:
+	- ifup-iucv
+	- mkkerneldoth.s390
+
+* Tue Apr 24 2001 Than Ngo <than@redhat.com>
+- add shutdown UPS into halt (bug #34312)
 
 * Sat Apr  7 2001 Preston Brown <pbrown@redhat.com>
 - broke out kernel.h updater from rc.sysinit into /sbin/mkkerneldoth
+
+* Fri Apr  6 2001 Bill Nottingham <notting@redhat.com>
+- be a little more careful in do_netreport (#34933)
 
 * Tue Apr  3 2001 Bill Nottingham <notting@redhat.com>
 - set umask explicitly to 022 in /etc/init.d/functions
