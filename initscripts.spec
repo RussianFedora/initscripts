@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.14
+Version: 7.42
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -16,6 +16,7 @@ Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 2.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
+Requires: ethtool >= 1.8-2
 Conflicts: kernel <= 2.4, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Obsoletes: rhsound sapinit
@@ -168,7 +169,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/networking/devices
 %dir /etc/sysconfig/networking/profiles
 %dir /etc/sysconfig/networking/profiles/default
-%config /etc/sysconfig/networking/ifcfg-lo
 %config(noreplace) /etc/sysconfig/rawdevices
 %config /etc/sysconfig/network-scripts/network-functions
 %config /etc/sysconfig/network-scripts/network-functions-ipv6
@@ -185,6 +185,8 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-plusb
 %config /etc/sysconfig/network-scripts/ifup-ipv6
 %config /etc/sysconfig/network-scripts/ifdown-ipv6
+%config /etc/sysconfig/network-scripts/ifup-ipsec
+%config /etc/sysconfig/network-scripts/ifdown-ipsec
 %config /etc/sysconfig/network-scripts/ifup-sit
 %config /etc/sysconfig/network-scripts/ifdown-sit
 %config /etc/sysconfig/network-scripts/ifup-aliases
@@ -224,6 +226,7 @@ rm -rf $RPM_BUILD_ROOT
 /bin/usleep
 %attr(4755,root,root) /usr/sbin/usernetctl
 /sbin/consoletype
+/sbin/genhostid
 /sbin/getkey
 %attr(2755,root,root) /sbin/netreport
 /sbin/initlog
@@ -246,8 +249,147 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Oct 28 2003 Bill Nottingham <notting@redhat.com> 7.42-1
+- show rhgb details on service failures
+
+* Wed Oct 22 2003 Bill Nottingham <notting@redhat.com> 7.41-1
+- tweak some rhgb interactions (#100894, #107725)
+- fix dvorak keymap loading (#106854)
+
+* Wed Oct 22 2003 Than Ngo <than@redhat.com> 7.40-1
+- add better fix to support nickname (#105785)
+
+* Wed Oct 22 2003 Than Ngo <than@redhat.com> 7.39-1
+- add support nickname (#105785)
+
+* Fri Oct 17 2003 Bill Nottingham <notting@redhat.com> 7.38-1
+- rhgb updates, now pass 'rhgb' to use it, instead of passing 'nogui'
+  to disable it
+
+* Fri Oct 10 2003 Bill Nottingham <notting@redhat.com> 7.37-1
+- bridging updates (#104421, <dwmw2@redhat.com>)
+
+* Wed Oct  8 2003 Bill Nottingham <notting@redhat.com> 7.36-1
+- mount /dev/pts before starting rhgb
+
+* Wed Oct  1 2003 Bill Nottingham <notting@redhat.com> 7.35-1
+- load acpi modules on startup if necessary
+- fix typo in ipsec comments & sysconfig.txt
+
+* Mon Sep 15 2003 Than Ngo <than@redhat.com> 7.34-1
+- use upsdrvctl to start the shutdown process
+
+* Mon Sep 15 2003 Bill Nottingham <notting@redhat.com> 7.33-1
+- ipsec fixes (#104227, <harald@redhat.com>)
+- ppp fixes (#104128, #97845, #85447)
+
+* Thu Sep 11 2003 Bill Nottingham <notting@redhat.com> 7.32-1
+- fix ip calls for some device names (#104187)
+- ipsec fixes
+
+* Fri Sep  5 2003 Bill Nottingham <notting@redhat.com> 7.31-1
+- fix bonding + dhcp (#91399)
+- fix typo (#103781)
+- sysconfig/network-scripts/ifup: fix use of local
+
+- fix shutdown with NFS root (#100556, <Julian.Blake@cern.ch>)
+- remove /var/run/confirm when done with /etc/rc (#100898)
+- ipcalc: fix some memory handling (#85478, <miked@ed.ac.uk>)
+- handle sorting > 10 network devices (#98209)
+- unset ONPARENT after use (#101384)
+- random other fixes
+- bridging support (<dwmw2@redhat.com>)
+
+* Fri Aug 15 2003 Bill Nottingham <notting@redhat.com> 7.30-1
+- IPv6 updates (#86210, #91375, <pekkas@netcore.fi>)
+
+* Fri Aug  8 2003 Bill Nottingham <notting@redhat.com> 7.29-1
+- setsysfont: don't echo to /dev/console (#102004)
+- fix ethernet device renaming deadlock (#101566)
+- consoletype: don't return 'vt' on vioconsole (#90465)
+- ifup: fix short-circuit (#101445)
+
+* Fri Jul 18 2003 Nalin Dahyabhai <nalin@redhat.com>
+- ifup-routes: pass the interface name to handle_file() so that we don't try
+  to use the routes file's name as an interface name
+
+* Wed Jul  9 2003 Bill Nottingham <notting@redhat.com> 7.28-1
+- switch from $CONFIG.keys to keys-$CONFIG
+
+* Tue Jul  8 2003 Bill Nottingham <notting@redhat.com> 7.27-1
+- add a check to consoletype for the current foreground console
+- use it when running unicode_start (#98753)
+
+* Wed Jul  2 2003 Bill Nottingham <notting@redhat.com> 7.26-1
+- ipsec support (see sysconfig.txt, ifup-ipsec)
+- read $CONFIG.keys, for non-world-readable keys
+- allow default window size for routes to be set with WINDOW= (#98112)
+- support setting device options with ethtool opts
+- fix s390 bootup spew (#98078)
+- support renaming interfaces with nameif based on hwaddr
+
+* Mon Jun 23 2003 Bill Nottingham <notting@redhat.com> 7.25-1
+- fix DNS punching in the case of other rules for the DNS server
+  (#97686, <martin@zepler.org>)
+- initlog, ppp-watch, and usernetctl tweaks (<linux_4ever@yahoo.com>)
+- fix grep for mingetty (#97188)
+- fix rhgb-client bad syntax
+- change network device searching, use correct naming, fix route issues
+  (<harald@redhat.com>)
+- other random tweaks
+
+* Fri May 23 2003 Bill Nottingham <notting@redhat.com> 7.24-1
+- now even still yet more tweaks for graphical boot
+
+* Thu May 22 2003 Bill Nottingham <notting@redhat.com> 7.23-1
+- even still yet more tweaks for graphical boot
+
+* Tue May 20 2003 Bill Nottingham <notting@redhat.com> 7.22-1
+- still yet more tweaks for graphical boot
+
+* Tue May 20 2003 Bill Nottingham <notting@redhat.com> 7.21-1
+- yet more tweaks for graphical boot
+
+* Fri May  2 2003 Bill Nottingham <notting@redhat.com> 7.20-1
+- more tweaks for graphical boot
+
+* Wed Apr 30 2003 Bill Nottingham <notting@redhat.com> 7.18-1
+- some tweaks for graphical boot
+
+* Mon Apr 21 2003 Florian La Roche <Florian.LaRoche@redhat.de>
+- initscripts-s390.patch: remove not needed parts about PNP=
+- inittab.390: sync with normal version
+- rc.sysinit: remove two further calls to /sbin/consoletype with $CONSOLETYPE
+
+* Fri Apr 18 2003 Florian La Roche <Florian.LaRoche@redhat.de>
+- sysconfig/init.s390: set LOGLEVEL=3 as for other archs
+- rc.d/init.d/network, rc.d/rc: change confirmation mode to
+  not use an environment variable
+- rc.d/init.d/functions: make strstr() even shorter, remove old
+  "case" version that has been already commented out
+- rc.d/rc.sysinit:
+	- no need to set NETWORKING=no, it is not used/exported
+	- do not export BOOTUP
+	- delete two "sleep 1" calls that wants to add time to go
+	  into confirmation mode. There is enough time to press a
+	  key anyway or use "confirm" in /proc/cmdline.
+	- read /proc/cmdline into a variable
+	- use strstr() to search in /proc/cmdline
+	- add "forcefsck" as possible option in /proc/cmdline
+	- while removing lock files, no need to call `basename`
+	- add unamer=`uname -r` and reduce number of forks
+	- do not fork new bash to create /var/log/ksyms.0
+
+* Thu Apr 03 2003 Karsten Hopp <karsten@redhat.de> 7.15-1
+- Mainframe has no /dev/ttyX devices and no mingetty, don't 
+  initialize them. This gave error messages during startup
+
+* Mon Mar 17 2003 Nalin Dahyabhai <nalin@redhat.com>
+- init.d/network: don't advertise "probe: true" in the header if we don't
+  recognize "probe" as an argument
+
 * Wed Mar 12 2003 Bill Nottingham <notting@redhat.com> 7.14-1
-- do not handle changed chain name; change was reverted
+* - do not handle changed chain name; change was reverted
 
 * Tue Feb 25 2003 Bill Nottingham <notting@redhat.com> 7.13-1
 - handle 7.x SYSFONTACM settings in setsysfont (#84183)
