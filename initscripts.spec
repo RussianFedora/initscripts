@@ -3,7 +3,7 @@ Name: initscripts
 Version: 7.87
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 2
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -16,7 +16,7 @@ Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 2.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
-Requires: ethtool >= 1.8-2, kernel >= 2.6, /sbin/nash, /bin/runuser
+Requires: ethtool >= 1.8-2, kernel >= 2.6, /sbin/nash, /sbin/runuser
 Conflicts: mkinitrd < 4.0
 Conflicts: timeconfig < 3.0, ppp < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
@@ -207,6 +207,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Oct  6 2004 Dan Walsh <notting@redhat.com> - 7.87-2
+- Change runuser location to /sbin
+
 * Tue Oct  5 2004 Dan Walsh <notting@redhat.com> - 7.87-1
 - Change SELinux relabel to not remount / 
 
