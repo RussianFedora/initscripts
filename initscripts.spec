@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.86
+Version: 7.87
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -16,7 +16,7 @@ Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 2.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
-Requires: ethtool >= 1.8-2, kernel >= 2.6, /sbin/nash
+Requires: ethtool >= 1.8-2, kernel >= 2.6, /sbin/nash, /bin/runuser
 Conflicts: mkinitrd < 4.0
 Conflicts: timeconfig < 3.0, ppp < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
@@ -207,6 +207,13 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Oct  5 2004 Dan Walsh <notting@redhat.com> - 7.87-1
+- Change SELinux relabel to not remount / 
+
+* Mon Oct  4 2004 Bill Nottingham <notting@redhat.com>
+- use runuser instead of su; require it
+- init.d/halt: use right file name for random seed (#134432)
+
 * Fri Oct  1 2004 Bill Nottingham <notting@redhat.com> - 7.86-1
 - use /etc/hotplug/blacklist to blacklist modules in hardware init (#132719)
 - filter indic locales on the console (#134198)
