@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.84
+Version: 7.85
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -10,7 +10,7 @@ Patch0: initscripts-s390.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, sysklogd >= 1.3.31
-Requires: setup >= 2.0.3, /sbin/fuser, which, /bin/grep
+Requires: setup >= 2.0.3, /sbin/fuser, /bin/grep
 Requires: modutils >= 2.3.11-5
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 2.0, SysVinit
@@ -21,6 +21,7 @@ Conflicts: mkinitrd < 4.0
 Conflicts: timeconfig < 3.0, ppp < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: udev < 0:032
+Conflcits: tcsh < 6.13-5
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils, sh-utils
 BuildPrereq: glib2-devel popt gettext pkgconfig
@@ -206,6 +207,19 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Sep 29 2004 Bill Nottingham <notting@redhat.com> - 7.85-1
+- ifup, network-functions: fix worked-by-accident shell quoting
+- lang.csh: remove setting of dspmbyte (#89549, <mitr@redhat.com>)
+- SELinux fixes
+- clean up prefdm
+- init.d/functions: export LC_MESSAGES (#133786)
+- allow daemon to coredump if requested (#130175)
+- network-functions: be more liberal in what we accept for link types (#90602, #127984)
+- fix overzealousness with -range aliases (#65415)
+- rc.sysinit: use s-c-keyboard, not kbdconfig (#133929)
+- fix checkpid logic, clean up potential errors (#134030)
+- translation updates
+
 * Wed Sep 22 2004 Bill Nottingham <notting@redhat.com> - 7.84-1
 - only start udev once
 
