@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.57
+Version: 7.58
 License: GPL
 Group: System Environment/Base
-Release: 2
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://rhlinux.redhat.com/initscripts/
 Patch0: initscripts-s390.patch
@@ -249,8 +249,16 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Tue Jun 15 2004 Elliot Lee <sopwith@redhat.com>
-- rebuilt
+* Tue Jun 29 2004 Bill Nottingham <notting@redhat.com> 7.58-1
+- rc.d/rc.sysinit: hack: make ICE directory on boot (#86480)
+- set devicetype for xDSL (#126194)
+- ignore locking failures when starting lvm volumes (#126192, <radu@primit.ro>)
+- unset LC_MESSAGES for rhgb (#126020, <ynakai@redhat.com>)
+- bonding fixes
+- setsysfont: remove error (#100559)
+- remove duplicate setting of network routes (#125450)
+- vlan fixes (#107504, <hrunting@texas.net>)
+- ifup-aliases: remove bogus route setting (#120908)
 
 * Tue May 25 2004 Bill Nottingham <notting@redhat.com> 7.57-1
 - readonly root fixes (<alexl@redhat.com>)
