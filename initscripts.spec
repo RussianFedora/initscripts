@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 6.40
+Version: 6.40.1
 License: GPL
 Group: System Environment/Base
-Release: 1c
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 Patch0: initscripts-s390.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
@@ -238,11 +238,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/locale/*/LC_MESSAGES
 
 %changelog
-* Fri Nov 30 2001 Karsten Hopp <karsten@redhat.de>
-- add __BOOT_KERNEL_SMP 1 to mkkerneldoth.s390
-
-* Tue Oct 23 2001 Karsten Hopp <karsten@redhat.de>
-- added missing parameter to ping
+* Wed Sep 25 2001 Bill Nottingham <notting@redhat.com>
+- flush all relevant addresses on ifdown (<pbrown@redhat.com>, #53531, #53704)
+- don't umount initrd on partitionless systems (#53509)
 
 * Sat Sep  8 2001 Bill Nottingham <notting@redhat.com>
 - don't run hwclock --adjust on a read-only filesystem
