@@ -3,7 +3,7 @@ Name: initscripts
 Version: 6.67
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 1a
 Source: initscripts-%{version}.tar.bz2
 URL: http://rhlinux.redhat.com/initscripts/
 Patch0: initscripts-s390.patch
