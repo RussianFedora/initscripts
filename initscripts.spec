@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.48
+Version: 7.54
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -249,6 +249,38 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Thu May 13 2004 Than Ngo <than@redhat.com> 7.54-1
+- add patch to enable PIE build of usernetctl
+
+* Fri May  7 2004 Jeremy Katz <katzj@redhat.com> - 7.53-1
+- little lvm tweak (#121963)
+
+* Tue May  4 2004 Bill Nottingham <notting@redhat.com> 7.52-1
+- ipv4 addresses are ints, not longs (#122479)
+
+* Tue May  4 2004 Bill Nottingham <notting@redhat.com> 7.51-1
+- get rid of LVM error when no volumes are defined (#121197)
+- fix selinux short-circuit test (#121143, <michal@harddata.com>)
+- /dev/mapper/control is a special file, check it accordingly (#121963)
+- support ETHTOOL_OPTS on bonding slaves (#119430, <hrunting@texas.net>)
+- handle multiple spaces correctly in rc.sysinit, network-functions
+  (#118583, <pallas@kadan.cz>)
+- cleanup fd leaks, mem leaks, other bogosities
+  (#119987, <linux_4ever@yahoo.com>)
+- rc.d/init.d/network: remove ipv6 bogosity (#114128)
+- translation updates
+
+* Fri Apr 16 2004 Bill Nottingham <notting@redhat.com> 7.50-1
+- fix LVM issues in rc.sysinit (#120458, #119975)
+- deal with fixed racoon parser
+- translation updates from translators
+- fix USB loading (#120911)
+
+* Fri Mar 26 2004 Bill Nottingham <notting@redhat.com> 7.49-1
+- use alsa for mixer saving in halt
+- don't umount /proc in halt (#118880)
+- various translation updates from translators
+
 * Wed Mar 17 2004 Bill Nottingham <notting@redhat.com> 7.48-1
 - disable enforcing in emergency mode for now, relabel some commonly
   mislabeled files on boot
