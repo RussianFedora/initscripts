@@ -3,7 +3,7 @@ Name: initscripts
 Version: 5.49
 Copyright: GPL
 Group: System Environment/Base
-Release: 1
+Release: 1j4
 Source: initscripts-%{version}.tar.gz
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
@@ -18,6 +18,7 @@ Conflicts: initscripts < 1.22.1-5
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils
 BuildPrereq: glib-devel
+Patch1: initscripts-lang.patch
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -27,6 +28,7 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
+%patch1 -p1 -b .lang
 
 %build
 make
@@ -232,6 +234,18 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Oct 18 2000 Akira TAGOH <tagoh@redhat.com>
+- fixed don't broken OUTPUT_CHARSET which set a value already.
+
+* Wed Oct 18 2000 Akira TAGOH <tagoh@redhat.com>
+- set OUTPUT_CHARSET in lang.{sh|csh}
+
+* Wed Oct 18 2000 Akira TAGOH <tagoh@redhat.com>
+- fixed typo
+
+* Tue Oct 10 2000 Akira TAGOH <tagoh@redhat.com>
+- fixed export /etc/sysconfig/i18n in lang.sh
+
 * Wed Aug 23 2000 Nalin Dahyabhai <nalin@redhat.com>
 - set "holdoff ${RETRYTIMEOUT} ktune" for demand-dialed PPP links
 
