@@ -1,27 +1,29 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 5.50
+Version: 5.83
 Copyright: GPL
 Group: System Environment/Base
-Release: 2
+Release: 1
 Source: initscripts-%{version}.tar.gz
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
-Requires: procps >= 2.0.6-5, sysklogd >= 1.3.31
+Requires: procps >= 2.0.7-7, sysklogd >= 1.3.31
 Requires: setup >= 2.0.3, /sbin/fuser, which
 Requires: modutils >= 2.3.11-5
-Requires: util-linux >= 2.10
+Requires: util-linux >= 2.10s-11, mount >= 2.10r-5
+Requires: bash >= 2.0
 Conflicts: kernel <= 2.2, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
-Conflicts: initscripts < 1.22.1-5, ypbind < 1.6-12
+Conflicts: ypbind < 1.6-12
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils
 BuildPrereq: glib-devel
 
 %description
 The initscripts package contains the basic system scripts used to boot
-your Red Hat system, change run levels, and shut the system down
+your Red Hat system, change runlevels, and shut the system down
 cleanly.  Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
+
 
 %prep
 %setup -q
@@ -69,6 +71,24 @@ done
 mkdir -p $RPM_BUILD_ROOT/var/{log,run}
 touch $RPM_BUILD_ROOT/var/run/utmp
 touch $RPM_BUILD_ROOT/var/log/wtmp
+
+# Put this stuff in /usr/share/locale too
+mkdir -p $RPM_BUILD_ROOT/usr/share/locale
+cp -a $RPM_BUILD_ROOT/etc/locale/* $RPM_BUILD_ROOT/usr/share/locale/
+
+pushd %{buildroot}/%{_datadir}/locale
+for foo in * ; do
+ echo  "%lang($foo) %{_datadir}/locale/$foo/*/*" >> \
+      $RPM_BUILD_DIR/%{name}-%{version}/trans.list
+done
+popd
+
+pushd  %{buildroot}/etc/locale
+for foo in * ; do
+  echo "%lang($foo) /etc/locale/$foo/*/*" >> \
+      $RPM_BUILD_DIR/%{name}-%{version}/trans.list
+done
+popd
 
 %pre
 /usr/sbin/groupadd -g 22 -r -f utmp
@@ -129,16 +149,12 @@ if [ -n "$FORWARD_IPV4" -a "$FORWARD_IPV4" != "no" -a "$FORWARD_IPV4" != "false"
 	echo "# added by initscripts install on `date`" >> /etc/sysctl.conf
 	echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
 fi
-if [ "$DEFRAG_IPV4" = "yes" -o "$DEFRAG_IPV4" = "true" ]; then
-	echo "# added by initscripts install on `date`" >> /etc/sysctl.conf
-	echo "net.ipv4.ip_always_defrag = 1" >> /etc/sysctl.conf
-fi
 
 newnet=`mktemp /etc/sysconfig/network.XXXXXX`
 if [ -n "$newnet" ]; then
   sed "s|FORWARD_IPV4.*|# FORWARD_IPV4 removed; see /etc/sysctl.conf|g" \
    /etc/sysconfig/network > $newnet
-  sed "s|DEFRAG_IPV4.*|# DEFRAG_IPV4 removed; see /etc/sysctl.conf|g" \
+  sed "s|DEFRAG_IPV4.*|# DEFRAG_IPV4 removed; obsolete in 2.4. kernel|g" \
    $newnet > /etc/sysconfig/network
   rm -f $newnet
 fi
@@ -166,7 +182,7 @@ fi
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -f trans.list
 %defattr(-,root,root)
 %dir /etc/sysconfig/network-scripts
 %config(noreplace) %verify(not md5 mtime size) /etc/adjtime
@@ -179,6 +195,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/console
 %config(noreplace) /etc/sysconfig/rawdevices
 %config /etc/sysconfig/network-scripts/network-functions
+%config /etc/sysconfig/network-scripts/network-functions-ipv6
 %config /etc/sysconfig/network-scripts/ifup-post
 %config /etc/sysconfig/network-scripts/ifcfg-lo
 %config /etc/sysconfig/network-scripts/ifdown-ppp
@@ -187,8 +204,16 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-sl
 %config /etc/sysconfig/network-scripts/ifup-routes
 %config /etc/sysconfig/network-scripts/ifup-plip
+%config /etc/sysconfig/network-scripts/ifup-plusb
+%config /etc/sysconfig/network-scripts/ifup-ipv6
+%config /etc/sysconfig/network-scripts/ifdown-ipv6
+%config /etc/sysconfig/network-scripts/ifup-sit
+%config /etc/sysconfig/network-scripts/ifdown-sit
 %config /etc/sysconfig/network-scripts/ifup-aliases
 %config /etc/sysconfig/network-scripts/ifup-ipx
+%ifarch s390 s390x
+%config /etc/sysconfig/network-scripts/ifup-ctc
+%endif
 %config /etc/X11/prefdm
 %config /etc/inittab
 %dir /etc/rc.d
@@ -207,6 +232,7 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/profile.d/lang.sh
 %config /etc/profile.d/lang.csh
 /usr/sbin/sys-unconfig
+/sbin/mkkerneldoth
 /sbin/setsysfont
 /bin/doexec
 /bin/ipcalc
@@ -224,13 +250,158 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ip-up
 %config /etc/ppp/ip-down
 %config /etc/initlog.conf
-%doc sysconfig.txt sysvinitfiles ChangeLog
+%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Wed Nov 29 2000 Bill Nottingham <notting@redhat.com>
-- don't set NIS domain name
+* Sat Apr  7 2001 Preston Brown <pbrown@redhat.com>
+- broke out kernel.h updater from rc.sysinit into /sbin/mkkerneldoth
+
+* Tue Apr  3 2001 Bill Nottingham <notting@redhat.com>
+- set umask explicitly to 022 in /etc/init.d/functions
+
+* Mon Apr  2 2001 Bill Nottingham <notting@redhat.com>
+- fix segfault in usernetctl (#34353)
+
+* Mon Mar 26 2001 Bill Nottingham <notting@redhat.com>
+- don't print errors in /etc/init.d/network if kernel.hotplug doesn't exist
+
+* Thu Mar 22 2001 Erik Troan <ewt@redhat.com>
+- take advantage of new swapon behaviors
+
+* Wed Mar 14 2001 Bill Nottingham <notting@redhat.com>
+- add cipe interfaces last (#31597)
+
+* Tue Mar 13 2001 Bill Nottingham <notting@redhat.com>
+- fix typo in ifup (#31627)
+- update translation source
+
+* Tue Mar 13 2001 Nalin Dahyabhai <nalin@redhat.com>
+- fix typo in rc.sysinit
+- fix ifup-routes not setting DEVICE properly
+
+* Mon Mar 12 2001 Preston Brown <pbrown@redhat.com>
+- Work properly with new quota utilities
+
+* Mon Mar  5 2001 Bill Nottingham <notting@redhat.com>
+- IPv6 fixes (#30506)
+- make static-routes handling more sane and consistent (#29500, #29549)
+- handle multiple USB controllers *correctly*
+
+* Wed Feb 28 2001 Nalin Dahyabhai <nalin@redhat.com>
+- usernetctl, ppp-watch: cleanups
+- netreport: use O_NOFOLLOW
+- ifup-ppp: let ppp-watch watch over demand-dialed connections (#28927)
+
+* Tue Feb 27 2001 Bill Nottingham <notting@redhat.com>
+- don't run isapnp on isapnp-enabled 2.4 kernels (part of #29450)
+- disable hotplug during network initscript
+- don't munge wireless keys in ifup; that will be done with the
+  PCMCIA wireless stuff
+- run sndconfig --mungepnp for non-native-isapnp soundcards
+- don't explicitly kill things in init.d/single, init will do it
+- don't explicitly load usb-storage; mount the usbdevfs before initializing
+  host controller modules
+
+* Wed Feb 21 2001 Bill Nottingham <notting@redhat.com>
+- initialize multiple USB controllers if necessary
+
+* Wed Feb 21 2001 Nalin Dahyabhai <nalin@redhat.com>
+- close extra file descriptors before exec()ing commands in initlog
+
+* Mon Feb 19 2001 Bill Nottingham <notting@redhat.com>
+- fix some substitions in init.d/functions (fixes various killproc issues)
+- make sure ipv6 module alias is available if configured
+- fix initlog segfaults in popt when called with bogus stuff (#28140)
+
+* Thu Feb 15 2001 Nalin Dahyabhai <nalin@redhat.com>
+- make pidofproc() and killproc() try to use the PID associated with the full
+  pathname first before killing the daemon by its basename (for daemons that
+  share the same basename, i.e. "master" in postfix and cyrus-imapd) (#19016)
+- fix status() as well
+
+* Wed Feb 14 2001 Bill Nottingham <notting@redhat.com>
+- fix init.d/single to work around possible kernel problem
+
+* Tue Feb 13 2001 Bill Nottingham <notting@redhat.com>
+- fix unmounting of loopback stuff (#26439, #14672)
+
+* Mon Feb 12 2001 Bill Nottingham <notting@redhat.com>
+- fix ifup-post so that it will work right when not called from ifup
+
+* Sat Feb 10 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- add all save changes for s390 s390x that won't break anything
+  patches are from Oliver Paukstadt @ millenux.com
+
+* Fri Feb  9 2001 Bill Nottingham <notting@redhat.com>
+- muck with the font in lang.csh/lang.sh, but don't spit out errors (#26903)
+
+* Wed Feb  7 2001 Bill Nottingham <notting@redhat.com>
+- ipv6 sync ups (#26502, #25775)
+- fix hangs at shutdown (#25744)
+- fix ifup-ppp (#26323)
+
+* Tue Feb  6 2001 Bill Nottingham <notting@redhat.com>
+- modify firewall on ifup to allow any new DNS servers through (#25951)
+- don't muck with the font in lang.csh/lang.sh (#26349)
+- don't display Japanese if we aren't on a pty (#25041)
+- load ide-scsi if passed on /proc/cmdline
+
+* Mon Feb  5 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- i18n updates
+
+* Fri Feb  2 2001 Bill Nottingham <notting@redhat.com>
+- actually *ship* the ipv6 (and plusb) files
+
+* Thu Feb  1 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- i18n updates
+
+* Tue Jan 30 2001 Bill Nottingham <notting@redhat.com>
+- various init.d/functions cleanups (#10761, from <mjt@tls.msk.ru>)
+- in daemon(), only look at pidfile to determine if process is running
+  (#17244, others)
+- ifup-ppp enhancements (#17388, from <ayn2@cornell.edu>)
+- ipv6 support (#23576, originally by Peter Bieringer <pb@bieringer.de>)
+- lots of other minor fixes (see ChangeLog)
+
+* Mon Jan 29 2001 Bill Nottingham <notting@redhat.com>
+- add plusb support (#18892, patch from <eric.ayers@compgen.com>)
+- don't ignore RETRYTIMEOUT when we never connect (#14071, patch from
+  <ak@cave.hop.stu.neva.ru>)
+
+* Wed Jan 24 2001 Bill Nottingham <notting@redhat.com>
+- quiet LVM setup (#24841)
+- fix inability to shutdown cleanly (#24889)
+
+* Tue Jan 23 2001 Bill Nottingham <notting@redhat.com>
+- new i18n mechanism
+
+* Tue Jan 23 2001 Matt Wilson <msw@redhat.com>
+- fixed typo in init.d/network - missing | in pipeline
+
+* Mon Jan 22 2001 Bill Nottingham <notting@redhat.com>
+- do LVM setup through normal initscripts mechanisms
+- ignore backup files in /etc/sysconfig/network-scripts
+- lots of .po file updates
+
+* Tue Jan  2 2001 Bill Nottingham <notting@redhat.com>
+- initial i18n support - originally from Conectiva
+
+* Mon Dec 11 2000 Bill Nottingham <notting@redhat.com>
+- only load sound if persistent DMA buffers are necessary
+- fix lots of bugs: #18619, #21187, #21283, #12097
+- integrate MAXFAIL option for ppp-watch
+- don't load keymaps/fonts on a serial console
+
+* Tue Nov 21 2000 Karsten Hopp <karsten@redhat.de>
+- changed hdparm section in rc.sysinit to allow different
+  parameters for each disk (if needed) by copying 
+  /etc/sysconfig/harddisks to /etc/sysconfig/harddiskhda (hdb,hdc..)
+- fix RFE #20967
+
+* Tue Oct 31 2000 Than Ngo <than@redhat.com>
+- fix the adding default route if GATEWAY=0.0.0.0
 
 * Tue Oct 10 2000 Nalin Dahyabhai <nalin@redhat.com>
 - handle "gw x.x.x.x" as the last pair of flags in ifup-routes (#18804)
