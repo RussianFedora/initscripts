@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 7.78
+Version: 7.80
 License: GPL
 Group: System Environment/Base
-Release: 2
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -205,6 +205,13 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Sep 10 2004 Bill Nottingham <notting@redhat.com> - 7.80-1
+- fix IPv6 6to4 & NAT (#118928, <pb@bieringer.de>, <pekkas@netcore.fi>)
+
+* Fri Sep 10 2004 Karsten Hopp <karsten@redhat.com> - 7.79-1
+- load ctc device config after /etc/sysconfig/network so that
+  GATEWAY doesn't get overwritten
+
 * Wed Sep  8 2004 Dan Walsh <dwalshg@redhat.com> - 7.78-2
 - fix setting SELinux contexts on udev-created-in-initrd devices
 - Let restorecon check if selinux is enabled.
