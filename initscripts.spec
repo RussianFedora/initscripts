@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.01
+Version: 8.02
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -186,8 +186,6 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/getkey
 /sbin/kmodule
 %attr(2755,root,root) /sbin/netreport
-/sbin/initlog
-/sbin/minilogd
 /sbin/service
 /sbin/ppp-watch
 %{_mandir}/man*/*
@@ -200,12 +198,17 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ip-down.ipv6to4
 %config /etc/ppp/ipv6-up
 %config /etc/ppp/ipv6-down
-%config /etc/initlog.conf
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Jan  3 2004 Bill Nottingham <notting@redhat.com> 8.02-1
+- remove initlog, minilogd
+- add a flag to kmodule for use with kudzu's socket mode, use it
+- change setting of IPv6 default route (#142308, <pb@bieringer.de>)
+- netfs: don't unmount NFS root FS (#142169)
+
 * Mon Dec  6 2004 Bill Nottingham <notting@redhat.com> 8.01-1
 - further bootup noise reductions
 - rc.d/rc.sysinit: do implicit unicode conversion on keymap
