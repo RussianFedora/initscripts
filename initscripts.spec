@@ -1,101 +1,59 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 5.85
-Copyright: GPL
+Version: 6.23
+License: GPL
 Group: System Environment/Base
-Release: 1.71.2sx
-Source: initscripts-%{version}.tar.gz
-Patch0: initscripts-s390x.patch
-Patch1: initscripts-5.85-backport5841.patch
-Patch2: initscripts-s390x-2.patch
+Release: 1
+Source: initscripts-%{version}.tar.bz2
+Patch0: initscripts-s390.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: procps >= 2.0.7-7, sysklogd >= 1.3.31
-Requires: setup >= 2.0.3, /sbin/fuser, which
+Requires: setup >= 2.0.3, /sbin/fuser, which, /bin/grep
 Requires: modutils >= 2.3.11-5
-Requires: util-linux >= 2.10s-11, mount >= 2.10r-5
-Requires: bash >= 2.0
+Requires: util-linux >= 2.10s-11, mount >= 2.11g-5
+Requires: bash >= 2.0, SysVinit
+Requires: /sbin/ip, /sbin/arping
 Conflicts: kernel <= 2.2, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12
 Obsoletes: rhsound sapinit
-Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils
-BuildPrereq: glib-devel
+Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils, sh-utils
+BuildPrereq: glib-devel popt
 
 %description
 The initscripts package contains the basic system scripts used to boot
 your Red Hat system, change runlevels, and shut the system down
-cleanly.  Initscripts also contains the scripts that activate and
+cleanly. Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
-
 
 %prep
 %setup -q
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-chmod 755 sysconfig/network-scripts/ifup-escon
+%ifarch s390 s390x
+%patch0 -p1 -b .s390init
+%endif
 
 %build
 make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT/etc
 make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} install 
-mkdir -p $RPM_BUILD_ROOT/var/run/netreport
-#chown root.root $RPM_BUILD_ROOT/var/run/netreport
-chmod u=rwx,g=rwx,o=rx $RPM_BUILD_ROOT/var/run/netreport
 
-for i in 0 1 2 3 4 5 6 ; do
-  file=$RPM_BUILD_ROOT/etc/rc.d/rc$i.d
-  mkdir $file
-# chown root.root $file
-  chmod u=rwx,g=rx,o=rx $file
-done
-
-# Can't store symlinks in a CVS archive
-ln -s ../init.d/killall $RPM_BUILD_ROOT/etc/rc.d/rc0.d/S00killall
-ln -s ../init.d/killall $RPM_BUILD_ROOT/etc/rc.d/rc6.d/S00killall
-
-ln -s ../init.d/halt $RPM_BUILD_ROOT/etc/rc.d/rc0.d/S01halt
-ln -s ../init.d/halt $RPM_BUILD_ROOT/etc/rc.d/rc6.d/S01reboot
-
-ln -s ../init.d/single $RPM_BUILD_ROOT/etc/rc.d/rc1.d/S00single
-
-ln -s ../rc.local $RPM_BUILD_ROOT/etc/rc.d/rc2.d/S99local
-ln -s ../rc.local $RPM_BUILD_ROOT/etc/rc.d/rc3.d/S99local
-ln -s ../rc.local $RPM_BUILD_ROOT/etc/rc.d/rc5.d/S99local
-
-# These are LSB compatibility symlinks.  At some point in the future
-# the actual files will be here instead of symlinks
-for i in 0 1 2 3 4 5 6 ; do
-  ln -s rc.d/rc$i.d $RPM_BUILD_ROOT/etc/rc$i.d
-done
-for i in rc rc.sysinit rc.local ; do
-  ln -s rc.d/$i $RPM_BUILD_ROOT/etc/$i
-done
-
-mkdir -p $RPM_BUILD_ROOT/var/{log,run}
-touch $RPM_BUILD_ROOT/var/run/utmp
-touch $RPM_BUILD_ROOT/var/log/wtmp
-
-# Put this stuff in /usr/share/locale too
-mkdir -p $RPM_BUILD_ROOT/usr/share/locale
-cp -a $RPM_BUILD_ROOT/etc/locale/* $RPM_BUILD_ROOT/usr/share/locale/
-
+# build file list of locale stuff in with lang tags
 pushd %{buildroot}/%{_datadir}/locale
 for foo in * ; do
- echo  "%lang($foo) %{_datadir}/locale/$foo/*/*" >> \
-      $RPM_BUILD_DIR/%{name}-%{version}/trans.list
+	echo  "%lang($foo) %{_datadir}/locale/$foo/*/*" >> \
+	$RPM_BUILD_DIR/%{name}-%{version}/trans.list
 done
 popd
 
 pushd  %{buildroot}/etc/locale
 for foo in * ; do
-  echo "%lang($foo) /etc/locale/$foo/*/*" >> \
-      $RPM_BUILD_DIR/%{name}-%{version}/trans.list
+	echo "%lang($foo) /etc/locale/$foo/*/*" >> \
+	$RPM_BUILD_DIR/%{name}-%{version}/trans.list
 done
 popd
+
 
 %pre
 /usr/sbin/groupadd -g 22 -r -f utmp
@@ -114,7 +72,7 @@ chkconfig --add rawdevices
 # handle serial installs semi gracefully
 if [ $1 = 0 ]; then
   if [ "$TERM" = "vt100" ]; then
-      tmpfile=/etc/sysconfig/tmp.$$
+      tmpfile=`mktemp /etc/sysconfig/tmp.XXXXXX`
       sed -e '/BOOTUP=color/BOOTUP=serial/' /etc/sysconfig/init > $tmpfile
       mv -f $tmpfile /etc/sysconfig/init
   fi
@@ -200,11 +158,17 @@ rm -rf $RPM_BUILD_ROOT
 /etc/sysconfig/network-scripts/ifup
 %config /sbin/ifup
 %dir /etc/sysconfig/console
+%dir /etc/sysconfig/networking
+%dir /etc/sysconfig/networking/devices
+%dir /etc/sysconfig/networking/profiles
+%dir /etc/sysconfig/networking/profiles/default
+%config /etc/sysconfig/networking/ifcfg-lo
 %config(noreplace) /etc/sysconfig/rawdevices
 %config /etc/sysconfig/network-scripts/network-functions
 %config /etc/sysconfig/network-scripts/network-functions-ipv6
-%config /etc/sysconfig/network-scripts/ifup-post
+%config /etc/sysconfig/network-scripts/init.ipv6-global
 %config /etc/sysconfig/network-scripts/ifcfg-lo
+%config /etc/sysconfig/network-scripts/ifup-post
 %config /etc/sysconfig/network-scripts/ifdown-ppp
 %config /etc/sysconfig/network-scripts/ifdown-sl
 %config /etc/sysconfig/network-scripts/ifup-ppp
@@ -217,7 +181,11 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-sit
 %config /etc/sysconfig/network-scripts/ifdown-sit
 %config /etc/sysconfig/network-scripts/ifup-aliases
-%config /etc/sysconfig/network-scripts/ifup-ipx
+%config /etc/sysconfig/network-scripts/ifup-ippp
+%config /etc/sysconfig/network-scripts/ifdown-ippp
+%config /etc/sysconfig/network-scripts/ifup-wireless
+/etc/sysconfig/network-scripts/ifup-isdn
+/etc/sysconfig/network-scripts/ifdown-isdn
 %ifarch s390 s390x
 %config /etc/sysconfig/network-scripts/ifup-ctc
 %config /etc/sysconfig/network-scripts/ifup-escon
@@ -256,20 +224,176 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/ppp-watch
 %{_mandir}/man*/*
 %dir %attr(775,root,root) /var/run/netreport
+%dir /etc/ppp
 %config /etc/ppp/ip-up
 %config /etc/ppp/ip-down
+%config /etc/ppp/ip-up.ipv6to4
+%config /etc/ppp/ip-down.ipv6to4
 %config /etc/initlog.conf
-%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto
+%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
+%dir /etc/locale
+%dir /etc/locale/*
+%dir /etc/locale/*/LC_MESSAGES
 
 %changelog
-* Fri Feb 15 2002 Phil Knirsch <pknirsch@redhat.com>
-- Added fixes for oco handling and ifup-ctc
-- Added ifup-escon.
+* Tue Aug 21 2001 Than Ngo <than@redhat.com>
+- fix shutdown/Bringing up isdn device
 
-* Wed Jan 30 2002 David Sainty <dsainty@redhat.com> 5.85-1.71.1sx
-- add in valid patches from 5.84.1-1 7.1 backport
+* Mon Aug 20 2001 Nalin Dahyabhai <nalin@redhat.com>
+- fix syntax error in lang.csh
+- set codeset by echoing to /dev/tty instead of /proc/self/fd/15
+
+* Sun Aug 19 2001 Bill Nottingham <notting@redhat.com>
+- fix a broken call to check_device_down
+- make all loopback addresses have host scope, not global scope.
+  Fixes #49374, possibly others
+
+* Wed Aug 15 2001 Bill Nottingham <notting@redhat.com>
+- add is_available() network function, use it; cleans up ugly modprobe
+  error messages
+- update translation info
+- fix #51787
+
+* Wed Aug 15 2001 Bernhard Rosenkraenzer <bero@redhat.com>
+- adjust s390 patch
+- fix up ifup-ctc and mkkerneldoth.s390 (both are s390 specific)
+
+* Mon Aug 13 2001 Yukihiro Nakai <ynakai@redhat.com>
+- don't display Chinese Korean if we aren't on a pty
+
+* Sat Aug 11 2001 Florian La Roche <Florian.LaRoche@redhat.de>
+- adjust s390 patches to current sources
+
+* Fri Aug 10 2001 Bill Nottingham <notting@redhat.com>
+- use GDM_LANG if it's set in lang.sh/lang.csh (#51432, <otaylor@redhat.com>)
+
+* Fri Aug 10 2001 Than Ngo <than@redhat.com>
+- don't set MSN if it' empty (it's now optional)
+- don't give login name as a cmdline-option (Bug #23066)
+- remove peer device file if ppp connection is down
+- fix channel bundling
+
+* Thu Aug  9 2001 Bill Nottingham <notting@redhat.com>
+- require SysVinit (#51335)
+
+* Wed Aug  8 2001 Bill Nottingham <notting@redhat.com>
+- tweak raittab grep slightly (#51231)
+- allow resetting of default route for DHCP addresses (#48994)
+- save resolv.conf in ifup-ppp for restoration by ifdown-post (#50759)
+- when munging firewall rules for dns, only allow dest ports 1025-65535 (#44038, #40833)
+- allow shell characters in ppp names (#43719)
+- allow setting DHCP arguments, just kill dhcpcd instead of using -k (#46492)
+- behave sanely if ifup called when dhcpcd is running (#49392, #51038)
+
+* Mon Aug  6 2001 Bill Nottingham <notting@redhat.com>
+- honor HOTPLUG=no if running under hotplug (#47483)
+- use awk, not grep, for modprobe -c checks (#49616)
+- don't print ugly messages for the case where the device doesn't exist,
+  and there is no alias (i.e., PCMCIA ONBOOT=yes (#various))
+- run kbdconfig in /.unconfigured mode (#43941)
+- use a bigger buffer size argument to dmesg (#44024)
+- detach loopback devices on shutdown (#43919, #45826)
+
+* Thu Aug  2 2001 Bill Nottingham <notting@redhat.com>
+- fix halt_get_remaining() (#50720)
+
+* Tue Jul 31 2001 Bill Nottingham <notting@redhat.com>
+- mount all FS types r/o at halt (#50461)
+- don't use mii-tool at all (#various)
+
+* Thu Jul 26 2001 Bill Nottingham <notting@redhat.com>
+- don't use kbd commands in setsysfont now that we've switched back to
+  console-tools (#50075)
+- sleep in check_link_down; some devices require it
+- only bring link down if check_link_down fails
+
+* Wed Jul 25 2001 Bill Nottingham <notting@redhat.com>
+- set link up before checking with mii-tool (#49949)
+
+* Tue Jul 24 2001 Bill Nottingham <notting@redhat.com>
+- update netdev stuff to use _netdev
+- IPv6 updates (<pekkas@netcore.fi>)
+- fix downing of devices with static IPs (#49777, #49783)
+- put ifcfg-lo back in the package
+
+* Fri Jul 20 2001 Preston Brown <pbrown@redhat.com> 6.06
+- updates for quota
+
+* Tue Jul 17 2001 Bill Nottingham <notting@redhat.com>
+- own some more directories
+- use -O nonetdev, require mount package that understands this
+- fix do_netreport when called as non-root
+- remove ip addresses from interfaces on ifdown
+- oops, fix ifup/ifdown
+
+* Mon Jul 16 2001 Than Ngo <than@redhat.com>
+- fix country_code for ISDN
+
+* Tue Jul  9 2001 Bill Nottingham <notting@redhat.com>
+- fix '--check'
+- prereq sh-utils (#43065)
+- fix some invocations of reboot/halt (#45966)
+- fix typo in ifup-wireless
+- don't muck with /etc/issue each boot
+- big IPv6 update (<pekkas@netcore.fi>)
+
+* Fri Jul  6 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- Add new directories required by new network tool
+
+* Thu Jul 05 2001 Karsten Hopp <karsten@redhat.de>
+- disable hwclock on S390 (no such executable)
+- Fix up kernel versioning on binary-only modules (S390)
+- don't use newt scripts on S390 console
+
+* Sat Jul 01 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- reenable pump, but make sure dhcpcd is the default. This
+  way, upgrades of systems without dhcpcd has a better chance at
+  working.
+
+* Thu Jun 28 2001 Trond Eivind Glomsrød <teg@redhat.com>
+- Disable pump completely
+
+* Wed Jun 27 2001 Than Ngo <than@redhat.com>
+- fix pap/chap authentication for syncppp
+- support ippp options
+	
+* Mon Jun 25 2001 Bill Nottingham <notting@redhat.com>
+- add ifup-wireless
+
+* Fri Jun 22 2001 Than Ngo <than@redhat.com>
+- add support xDSL
+
+* Thu Jun 21 2001 Bill Nottingham <notting@redhat.com>
+- more networking script fixes (#45364)
+- add stuff for unmounting /initrd
+
+* Thu Jun 21 2001 Than Ngo <than@redhat.com>
+- add support ISDN
+
+* Wed Jun 20 2001 Bill Nottingham <notting@redhat.com>
+- fix extremely broken new network scripts
+
+* Wed Jun 20 2001 Bill Nottingham <notting@redhat.com>
+- bump version to 5.89
+- make it build
+
+* Thu May 17 2001 Bill Nottingham <notting@redhat.com>
+- don't run ifup ppp0 if ppp-watch gets SIGINT (#40585, ak@cave.hop.stu.neva.ru)
+- fix do_netreport (#37716, #39603 <crlf@aeiou.pt>)
+
+* Wed May 16 2001 Nalin Dahyabhai <nalin@redhat.com>
+- copyright: GPL -> license: GPL
+- fix a syntax error in lang.csh
+- skip commented-out i18n configuration lines in lang.csh
+
+* Fri May 11 2001 Preston Brown <pbrown@redhat.com>
+- new network-scripts infrastructure; ifcfg-lo moved to /etc/sysconfig/networking
+
+* Wed May  2 2001 Bernhard Rosenkraenzer <bero@redhat.com> 5.86-1
+- support kbd in setsysfont
+- bzip2 source
 
 * Wed Apr 25 2001 Florian La Roche <Florian.LaRoche@redhat.de>
 - add further s390 changes:
