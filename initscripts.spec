@@ -1,24 +1,21 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 5.49
+Version: 5.50
 Copyright: GPL
 Group: System Environment/Base
-Release: 1j4
+Release: 2
 Source: initscripts-%{version}.tar.gz
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: procps >= 2.0.6-5, sysklogd >= 1.3.31
 Requires: setup >= 2.0.3, /sbin/fuser, which
 Requires: modutils >= 2.3.11-5
-%ifarch alpha
-Requires: util-linux >= 2.9w-26
-%endif
+Requires: util-linux >= 2.10
 Conflicts: kernel <= 2.2, timeconfig < 3.0, pppd < 2.3.9, wvdial < 1.40-3
-Conflicts: initscripts < 1.22.1-5
+Conflicts: initscripts < 1.22.1-5, ypbind < 1.6-12
 Obsoletes: rhsound sapinit
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils
 BuildPrereq: glib-devel
-Patch1: initscripts-lang.patch
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -28,7 +25,6 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
-%patch1 -p1 -b .lang
 
 %build
 make
@@ -36,7 +32,7 @@ make
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/etc
-make ROOT=$RPM_BUILD_ROOT mandir=%{_mandir} install 
+make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} install 
 mkdir -p $RPM_BUILD_ROOT/var/run/netreport
 #chown root.root $RPM_BUILD_ROOT/var/run/netreport
 chmod u=rwx,g=rwx,o=rx $RPM_BUILD_ROOT/var/run/netreport
@@ -66,7 +62,7 @@ ln -s ../rc.local $RPM_BUILD_ROOT/etc/rc.d/rc5.d/S99local
 for i in 0 1 2 3 4 5 6 ; do
   ln -s rc.d/rc$i.d $RPM_BUILD_ROOT/etc/rc$i.d
 done
-for i in init.d rc rc.sysinit rc.local ; do
+for i in rc rc.sysinit rc.local ; do
   ln -s rc.d/$i $RPM_BUILD_ROOT/etc/$i
 done
 
@@ -198,7 +194,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/rc.d
 %dir /etc/rc.d/rc[0-9].d
 %config(missingok) /etc/rc.d/rc[0-9].d/*
-/etc/init.d
 /etc/rc[0-9].d
 /etc/rc
 %dir /etc/rc.d/init.d
@@ -234,17 +229,16 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Wed Oct 18 2000 Akira TAGOH <tagoh@redhat.com>
-- fixed don't broken OUTPUT_CHARSET which set a value already.
+* Wed Nov 29 2000 Bill Nottingham <notting@redhat.com>
+- don't set NIS domain name
 
-* Wed Oct 18 2000 Akira TAGOH <tagoh@redhat.com>
-- set OUTPUT_CHARSET in lang.{sh|csh}
+* Tue Oct 10 2000 Nalin Dahyabhai <nalin@redhat.com>
+- handle "gw x.x.x.x" as the last pair of flags in ifup-routes (#18804)
+- fix top-level makefile install target
+- make usernetctl just fall-through if getuid() == 0
 
-* Wed Oct 18 2000 Akira TAGOH <tagoh@redhat.com>
-- fixed typo
-
-* Tue Oct 10 2000 Akira TAGOH <tagoh@redhat.com>
-- fixed export /etc/sysconfig/i18n in lang.sh
+* Sun Sep  3 2000 Florian La Roche <Florian.LaRoche@redhat.com>
+- /etc/init.d is already provided by chkconfig
 
 * Wed Aug 23 2000 Nalin Dahyabhai <nalin@redhat.com>
 - set "holdoff ${RETRYTIMEOUT} ktune" for demand-dialed PPP links
