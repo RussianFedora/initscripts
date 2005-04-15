@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.07
+Version: 8.08
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -10,20 +10,19 @@ Patch0: initscripts-s390.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, sysklogd >= 1.3.31
-Requires: setup >= 2.0.3, /sbin/fuser, /bin/grep
-Requires: modutils >= 2.3.11-5
+Requires: /sbin/fuser, /bin/grep
+Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
-Requires: bash >= 2.0, SysVinit
+Requires: bash >= 3.0, SysVinit
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, kernel >= 2.6, /sbin/nash, /sbin/runuser
 Conflicts: mkinitrd < 4.0
-Conflicts: timeconfig < 3.0, ppp < 2.3.9, wvdial < 1.40-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: udev < 0:048
 Conflicts: tcsh < 6.13-5
 Obsoletes: rhsound sapinit
-Prereq: /sbin/chkconfig, /usr/sbin/groupadd, gawk, fileutils, sh-utils
+Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, mktemp, fileutils, sh-utils
 BuildPrereq: glib2-devel popt gettext pkgconfig
 BuildPrereq: kudzu-devel >= 1.1.80
 
@@ -86,15 +85,11 @@ if [ $1 = 0 ]; then
   fi
 fi
 
-# dup of timeconfig %post - here to avoid a dependency
-if [ -L /etc/localtime ]; then
-    _FNAME=`ls -ld /etc/localtime | awk '{ print $11}' | sed 's/lib/share/'`
-    rm /etc/localtime
-    cp -f $_FNAME /etc/localtime
-    if ! grep -q "^ZONE=" /etc/sysconfig/clock ; then
-      echo "ZONE=\"$_FNAME"\" | sed -e "s|[^\"]*/usr/share/zoneinfo/||" >> /etc/sysconfig/clock
-    fi
+# Handle converting prefdm to run-once
+if fgrep -q "x:5:respawn:/etc/X11/prefdm -nodaemon" /etc/inittab ; then
+    sed --in-place=.rpmsave 's|^x:5:respawn:/etc/X11/prefdm -nodaemon|x:5:once:/etc/X11/prefdm -nodaemon|g' /etc/inittab
 fi
+
 
 %preun
 if [ $1 = 0 ]; then
@@ -124,6 +119,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/sysconfig/network-scripts/ifup
 %config /sbin/ifup
 %dir /etc/sysconfig/console
+%dir /etc/sysconfig/modules
 %dir /etc/sysconfig/networking
 %dir /etc/sysconfig/networking/devices
 %dir /etc/sysconfig/networking/profiles
@@ -209,6 +205,34 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Apr 15 2005 Bill Nottingham <notting@redhat.com> 8.08-1
+- update translation base
+- automatically send hostname for DHCP if it's available and not
+  overridden (#149667)
+- load user-defined module scripts from /etc/sysconfig/modules at
+  boot (#123927)
+- halt: reverse sort the mount list, avoiding errors
+  (#147254, <jamesodhunt@hotmail.com>)
+- ifup-wireless: add SECURITYMODE (#145407)
+- network-functions: don't error out if hotplug doesn't exist (#140008)
+- ifup: always return errors on trying to bring up nonexistent devices (#131461)
+- ifup: fix error message (#143674)
+- rc.sysinit: add a autorelabel boot target (#154496)
+- prefdm: if something else is specified as $DISPLAYMANAGER, try that (#147304)
+- remove support for the old firewall type
+- network: optimize some (#138557, <drepper@redhat.com>)
+- prefdm: fix prefdm arg handling (#154312, <khc@pm.waw.pl>)
+- gdm early-login support (adapted from <rstrode@redhat.com>)
+- ifup-routes: make sure commented lines are handled correctly (#154353,
+  #114548, <link@pobox.com>)
+- some sysconfig.txt updates (<link@pobox.com>, <jvdias@redhat.com>)
+- rc.sysinit: fix restorecon invocation (#153100)
+- initlog: free some of the more egregious memory leaks (#85935)
+- initlog: fix potential memory overread (#153685, <in-redhat@baka.org>)
+- remove some conflicts, %post scripts, etc. that were only relelvant
+  for upgrades from pre-7.0
+- other minor fixes, see ChangeLog
+
 * Thu Mar 31 2005 Bill Nottingham <notting@redhat.com> 8.07-1
 - bring back initlog for third-party scripts until a new framework is
   in place
