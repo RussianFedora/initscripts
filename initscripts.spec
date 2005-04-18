@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.08
 License: GPL
 Group: System Environment/Base
-Release: 2
+Release: 3
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -205,6 +205,12 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Apr 18 2005 Karsten Hopp <karsten@redhat.de> 8.08-3
+- fix ifup-routes script (#155195)
+
+* Mon Apr 18 2005 Florian La Roche <laroche@redhat.com>
+- fix strstr call in rc.sysinit
+
 * Fri Apr 15 2005 Bill Nottingham <notting@redhat.com> 8.08-1
 - update translation base
 - automatically send hostname for DHCP if it's available and not
