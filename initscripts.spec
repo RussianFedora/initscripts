@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.08
+Version: 8.09
 License: GPL
 Group: System Environment/Base
-Release: 3
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -13,7 +13,7 @@ Requires: /sbin/sysctl, sysklogd >= 1.3.31
 Requires: /sbin/fuser, /bin/grep
 Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
-Requires: bash >= 3.0, SysVinit
+Requires: bash >= 3.0, SysVinit >= 2.85-38
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, kernel >= 2.6, /sbin/nash, /sbin/runuser
@@ -70,8 +70,9 @@ rm -f \
 %post
 touch /var/log/wtmp
 touch /var/run/utmp
-chown root:utmp /var/log/wtmp /var/run/utmp
-chmod 664 /var/log/wtmp /var/run/utmp
+touch /var/log/btmp
+chown root:utmp /var/log/wtmp /var/run/utmp /var/log/btmp
+chmod 664 /var/log/wtmp /var/run/utmp /var/log/btmp
 
 /sbin/chkconfig --add netfs 
 /sbin/chkconfig --add network 
@@ -201,10 +202,21 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ipv6-down
 %config /etc/initlog.conf
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
+%ghost %attr(0664,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Apr 27 2005 Bill Nottingham <notting@redhat.com> 8.09-1
+- rc.sysinit: clean up screen sockets (#155969)
+- functions: use pidof -c in various functions
+- ifup-ppp: fix static routes with ppp demand dialing (#20142,
+  <ohrn+redhat@chalmers.se>)
+- add btmp support (#155537)
+- don't send dhcp hostname (revert of fix for #149667)
+- more early-login modifications (<mclasen@redhat.com>)
+- functions: fix echo (#155270)
+
 * Mon Apr 18 2005 Karsten Hopp <karsten@redhat.de> 8.08-3
 - fix ifup-routes script (#155195)
 
