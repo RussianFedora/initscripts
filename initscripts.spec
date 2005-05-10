@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.10
+Version: 8.11
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -72,7 +72,8 @@ touch /var/log/wtmp
 touch /var/run/utmp
 touch /var/log/btmp
 chown root:utmp /var/log/wtmp /var/run/utmp /var/log/btmp
-chmod 664 /var/log/wtmp /var/run/utmp /var/log/btmp
+chmod 664 /var/log/wtmp /var/run/utmp
+chmod 600 /var/log/btmp
 
 /sbin/chkconfig --add netfs 
 /sbin/chkconfig --add network 
@@ -202,11 +203,20 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ipv6-down
 %config /etc/initlog.conf
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
-%ghost %attr(0664,root,utmp) /var/log/btmp
+%ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue May 10 2005 Bill Nottingham <notting@redhat.com> 8.11-1
+- fix mis-bringup of interfaces due to accidentally matched HWADDR
+  (a.k.a. ONBOOT=no not working) (#153669, #157252)
+- support automatic relabeling later if rebooted w/o SELinux
+  (<dwalsh@redhat.com>)
+- rc.sysinit: fix fixfiles invocation (#157182)
+- btmp should be 0600 (#156900)
+- translation updates: fr, bg, ru, mk, pa, es
+
 * Fri Apr 29 2005 Bill Nottingham <notting@redhat.com> 8.10-1
 - fix hang on stale GDM sockets (#156355)
 
