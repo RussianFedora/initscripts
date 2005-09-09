@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.12
+Version: 8.13
 License: GPL
 Group: System Environment/Base
-Release: 3
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -209,11 +209,8 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Tue Aug 30 2005 Bill Nottingham <notting@redhat.com> 8.12-3
-- rebuild against fixed kudzu (#157783)
-
-* Wed Aug 24 2005 Bill Nottingham <notting@redhat.com> 8.12-2
-- rebuild against fixed kudzu (#166602)
+* Fri Sep  9 2005 Bill Nottingham <notting@redhat.com> 8.13-1
+- fix on-boot relabelling (<dwalsh@redhat.com>)
 
 * Mon Aug 22 2005 Bill Nottingham <notting@redhat.com> 8.12-1
 - ifup-eth: fix interface renaming (#158774)
