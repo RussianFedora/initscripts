@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.17
+Version: 8.18
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -19,7 +19,7 @@ Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/nash, /sbin/runuser
 Conflicts: mkinitrd < 4.0, kernel < 2.6.12
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
-Conflicts: udev < 0:048
+Conflicts: udev < 0:048, dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
 #Conflicts: diskdumputils < 1.1.0
 Obsoletes: rhsound sapinit
@@ -206,6 +206,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Dec  2 2005 Bill Nottingham <notting@redhat.com> 8.18-1
+- use new dhclient file paths, add appropriate conflict (#169164)
+	
 * Wed Oct  5 2005 Bill Nottingham <notting@redhat.com> 8.17-1
 - make sure corefile limiting works for user processes as well
   (#166511, <ville.skytta@iki.fi>)
