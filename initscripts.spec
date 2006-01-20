@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.20
+Version: 8.21
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -22,8 +22,10 @@ Conflicts: mkinitrd < 4.0, kernel < 2.6.12
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
+Conflicts: xorg-x11
 #Conflicts: diskdumputils < 1.1.0
 Obsoletes: rhsound sapinit
+Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, mktemp, fileutils, sh-utils
 BuildPrereq: glib2-devel popt gettext pkgconfig
 
@@ -32,7 +34,6 @@ The initscripts package contains the basic system scripts used to boot
 your Red Hat system, change runlevels, and shut the system down
 cleanly.  Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
-
 
 %prep
 %setup -q
@@ -154,10 +155,12 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-wireless
 /etc/sysconfig/network-scripts/ifup-isdn
 /etc/sysconfig/network-scripts/ifdown-isdn
+/etc/sysconfig/network-scripts/net.hotplug
 %ifarch s390 s390x
 %config /etc/sysconfig/network-scripts/ifup-ctc
 %config /etc/sysconfig/network-scripts/ifup-iucv
 %endif
+/etc/udev/rules.d/*
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
 %dir /etc/rc.d
@@ -205,6 +208,16 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Jan 20 2006 Bill Nottingham <notting@redhat.com> 8.21-1
+- move handling of network hotplug events here, add appropriate udev
+  rules, obsolete hotplug
+- get rid of some path lookups (#178321, <mclasen@redhat.com>)
+- get hwaddrs from sysfs as opposed to ip | sed
+- translation updates
+- lang.sh: don't run unicode_start for subshells (#176832)
+- halt: ignore sysfs but not /sys<otherstuff> (#177612, <bnocera@redhat.com>)
+- add service(8) man page (#44857) <mitr@redhat.com>
+
 * Wed Dec 21 2005 Bill Nottingham <notting@redhat.com> 8.20-1
 - remove kmodule. udev handles module loading now
 - require appropriate udev
