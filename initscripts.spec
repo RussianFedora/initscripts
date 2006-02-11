@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.26
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 1.1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -208,6 +208,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 8.26-1.1
+- bump again for double-long bug on ppc(64)
+
 * Tue Feb  7 2006 Bill Nottingham <notting@redhat.com> 8.26-1
 - revert "rc.sysinit: don't mount usbfs, libusb no longer uses it" change
 - add some ugly hacks to make sure net hotplug doesn't run after unclean
