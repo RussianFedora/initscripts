@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.26
+Version: 8.27
 License: GPL
 Group: System Environment/Base
-Release: 1.1
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 Patch0: initscripts-s390.patch
@@ -208,8 +208,10 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Fri Feb 10 2006 Jesse Keating <jkeating@redhat.com> - 8.26-1.1
-- bump again for double-long bug on ppc(64)
+* Mon Feb 13 2006 Bill Nottingham <notting@redhat.com> 8.27-1
+- translation updates
+- lang.sh: revert fix for #176832, it's broken
+- ifup-aliases fixes (<pjones@redhat.com>,<mitr@redhat.com>)
 
 * Tue Feb  7 2006 Bill Nottingham <notting@redhat.com> 8.26-1
 - revert "rc.sysinit: don't mount usbfs, libusb no longer uses it" change
