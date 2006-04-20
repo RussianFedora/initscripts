@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.32
+Version: 8.33
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -114,6 +114,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/network-scripts
 %config(noreplace) %verify(not md5 mtime size) /etc/adjtime
 %config(noreplace) /etc/sysconfig/init
+%config(noreplace) /etc/sysconfig/readonly-root
 /etc/sysconfig/network-scripts/ifdown
 %config /sbin/ifdown
 %config /etc/sysconfig/network-scripts/ifdown-post
@@ -160,6 +161,8 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-ctc
 %config /etc/sysconfig/network-scripts/ifup-iucv
 %endif
+/etc/rwtab
+%dir /etc/rwtab.d
 /etc/udev/rules.d/*
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
@@ -204,11 +207,18 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ipv6-down
 %config /etc/initlog.conf
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
+/var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Thu Apr 20 2006 Bill Nottingham <notting@redhat.com> 8.33-1
+- support for readonly root
+- rc.sysinit: remove call to zfcpconf.sh - that should be udev rules
+- ifup*: add NETWORKDELAY and LINKDELAY (#176851, <mitr@redhat.com>)
+- rc.sysinit: remove obsolete initrd code (<pjones@redhat.com>)
+
 * Mon Apr 10 2006 Bill Nottingham <notting@redhat.com> 8.32-1
 - netfs: fix redirect (#187505)
 - rc.sysinit add forcequotacheck (#168118, <mitr@redhat.com>)
