@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.33
+Version: 8.34
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -22,12 +22,12 @@ Conflicts: mkinitrd < 4.0, kernel < 2.6.12
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
-Conflicts: xorg-x11
+Conflicts: xorg-x11, glib2 < 2.11.1-2
 #Conflicts: diskdumputils < 1.1.0
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, mktemp, fileutils, sh-utils
-BuildPrereq: glib2-devel popt gettext pkgconfig
+BuildRequires: glib2-devel popt gettext pkgconfig
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -150,7 +150,6 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-sit
 %config /etc/sysconfig/network-scripts/ifdown-sit
 %config /etc/sysconfig/network-scripts/ifup-aliases
-%config /etc/sysconfig/network-scripts/ifdown-aliases
 %config /etc/sysconfig/network-scripts/ifup-ippp
 %config /etc/sysconfig/network-scripts/ifdown-ippp
 %config /etc/sysconfig/network-scripts/ifup-wireless
@@ -188,6 +187,7 @@ rm -rf $RPM_BUILD_ROOT
 /bin/usleep
 %attr(4755,root,root) /usr/sbin/usernetctl
 /sbin/consoletype
+/sbin/fstab-decode
 /sbin/genhostid
 /sbin/getkey
 %attr(2755,root,root) /sbin/netreport
@@ -213,6 +213,17 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue May 23 2006 Bill Nottingham <notting@redhat.com> 8.34-1
+- link glib2 dynamically now that it's in /lib, conflict with older
+  versions
+- handle cups specially when cleaning /var (#189168)
+- remove ifdown-aliases (<mitr@redhat.com>)
+- ifup-ipsec: fix key handling when only one of AH or ESP is used
+  (#166257, <mituc@iasi.rdsnet.ro>)
+- IPv6 updates, including RFC 3041 support (<pb@bieringer.de>)
+- routing fixes, add METRIC support for default routes (#124045, <mitr@redhat.com>)
+- fix handling of mount points with white space (#186713, <mitr@redhat.com>)
+
 * Thu Apr 20 2006 Bill Nottingham <notting@redhat.com> 8.33-1
 - support for readonly root
 - rc.sysinit: remove call to zfcpconf.sh - that should be udev rules
