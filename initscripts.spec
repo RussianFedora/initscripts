@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.35
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 1.1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
@@ -209,6 +209,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 8.35-1.1
+- rebuild
+
 * Mon Jun 12 2006 Bill Nottingham <notting@redhat.com> 8.35-1
 - readonly root enhancments (modified from <law@redhat.com>, #193164)
 - encrypted swap, non-root filesystem support (#127378, <mitr@redhat.com, <redhat@flyn.org>)
