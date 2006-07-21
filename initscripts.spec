@@ -1,9 +1,9 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.35
+Version: 8.36
 License: GPL
 Group: System Environment/Base
-Release: 1.1
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
@@ -112,10 +112,10 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/sysconfig/init
 %config(noreplace) /etc/sysconfig/readonly-root
 /etc/sysconfig/network-scripts/ifdown
-%config /sbin/ifdown
+/sbin/ifdown
 %config /etc/sysconfig/network-scripts/ifdown-post
 /etc/sysconfig/network-scripts/ifup
-%config /sbin/ifup
+/sbin/ifup
 %dir /etc/sysconfig/console
 %dir /etc/sysconfig/modules
 %dir /etc/sysconfig/networking
@@ -133,6 +133,7 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifup-ppp
 %config /etc/sysconfig/network-scripts/ifup-sl
 %config /etc/sysconfig/network-scripts/ifup-routes
+%config /etc/sysconfig/network-scripts/ifdown-routes
 %config /etc/sysconfig/network-scripts/ifup-plip
 %config /etc/sysconfig/network-scripts/ifup-plusb
 %config /etc/sysconfig/network-scripts/ifup-bnep
@@ -209,6 +210,27 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Jul 21 2006 Bill Nottingham <notting@redhat.com> 8.36-1
+- rework automatic swapon - only run if AUTOSWAP=yes, and fix errors
+  (#198695, #196179, #196208)
+- redo single so it starts last in runlevel 1, and doesn't kill/start
+  services itself
+- add configurable delay for killproc() (#198429, <jorton@redhat.com>)
+- fix loop in rename_device (#199242, <markmc@redhat.com>)
+- rc.sysinit: stateless updates (#197972, <law@redhat.com>)
+- support for copying dhcp leases from initramfs (#198601, <markmc@redhat.com>)
+- readonly-root: SELinux works now in the kernel, allow it
+- init.d/network: don't bring down network if root is on a network device
+- init.d/halt: don't use -i to halt; causes problems with iscsi
+- add support for routing rule-$device (#132252, <mitr@redhat.com>)
+- fix rhgb output (#192604, <tonynelson@georgeanelson.com>)
+- fix crypttab options for LUKS (#197656, <mitr@redhat.com>)
+- ipsec: various fixes & new features (#150682, #168972, <mitr@redhat.com>, <alex@milivojevic.org>)
+- ipsec: add check for IKE_METHOD (#197576, <john_smyth@mail.ru>)
+- rename_device: ignore alias devices, fix race (#186355)
+- ifup/ifdown: don't mark as %config
+- rwtab: some additions/cleanup
+
 * Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 8.35-1.1
 - rebuild
 
