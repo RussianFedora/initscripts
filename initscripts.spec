@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.36
+Version: 8.37
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -210,6 +210,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Jul 21 2006 Bill Nottingham <notting@redhat.com> 8.37-1
+- update translations
+
 * Fri Jul 21 2006 Bill Nottingham <notting@redhat.com> 8.36-1
 - rework automatic swapon - only run if AUTOSWAP=yes, and fix errors
   (#198695, #196179, #196208)
@@ -230,9 +233,6 @@ rm -rf $RPM_BUILD_ROOT
 - rename_device: ignore alias devices, fix race (#186355)
 - ifup/ifdown: don't mark as %config
 - rwtab: some additions/cleanup
-
-* Wed Jul 12 2006 Jesse Keating <jkeating@redhat.com> - 8.35-1.1
-- rebuild
 
 * Mon Jun 12 2006 Bill Nottingham <notting@redhat.com> 8.35-1
 - readonly root enhancments (modified from <law@redhat.com>, #193164)
