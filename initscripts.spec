@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.37
+Version: 8.38
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -22,10 +22,9 @@ Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
 Conflicts: xorg-x11, glib2 < 2.11.1-2
-#Conflicts: diskdumputils < 1.1.0
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
-Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, mktemp, fileutils, sh-utils
+Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
 BuildRequires: glib2-devel popt gettext pkgconfig
 
 %description
@@ -42,15 +41,9 @@ make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} install 
+make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} install
 
-# build file list of locale stuff in with lang tags
-pushd %{buildroot}/%{_datadir}/locale
-for foo in * ; do
-	echo  "%lang($foo) %{_datadir}/locale/$foo/*/*" >> \
-	$RPM_BUILD_DIR/%{name}-%{version}/trans.list
-done
-popd
+%find_lang %{name}
 
 %ifnarch s390 s390x
 rm -f \
@@ -66,9 +59,7 @@ rm -f \
 /usr/sbin/groupadd -g 22 -r -f utmp
 
 %post
-touch /var/log/wtmp
-touch /var/run/utmp
-touch /var/log/btmp
+touch /var/log/wtmp /var/run/utmp /var/log/btmp
 chown root:utmp /var/log/wtmp /var/run/utmp /var/log/btmp
 chmod 664 /var/log/wtmp /var/run/utmp
 chmod 600 /var/log/btmp
@@ -77,12 +68,8 @@ chmod 600 /var/log/btmp
 /sbin/chkconfig --add network 
 
 # handle serial installs semi gracefully
-if [ $1 = 0 ]; then
-  if [ "$TERM" = "vt100" ]; then
-      tmpfile=`mktemp /etc/sysconfig/tmp.XXXXXX`
-      sed -e '/BOOTUP=color/BOOTUP=serial/' /etc/sysconfig/init > $tmpfile
-      mv -f $tmpfile /etc/sysconfig/init
-  fi
+if [ $1 = 0 -a "$TERM" = "vt100" ]; then
+    sed -i 's/BOOTUP=color/BOOTUP=serial/' /etc/sysconfig/init
 fi
 
 # Handle converting prefdm to run-once
@@ -105,7 +92,7 @@ exit 0
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files -f trans.list
+%files -f %{name}.lang
 %defattr(-,root,root)
 %dir /etc/sysconfig/network-scripts
 %config(noreplace) %verify(not md5 mtime size) /etc/adjtime
@@ -146,6 +133,8 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/sysconfig/network-scripts/ifdown-ipsec
 %config /etc/sysconfig/network-scripts/ifup-sit
 %config /etc/sysconfig/network-scripts/ifdown-sit
+%config /etc/sysconfig/network-scripts/ifup-tunnel
+%config /etc/sysconfig/network-scripts/ifdown-tunnel
 %config /etc/sysconfig/network-scripts/ifup-aliases
 %config /etc/sysconfig/network-scripts/ifup-ippp
 %config /etc/sysconfig/network-scripts/ifdown-ippp
@@ -210,6 +199,21 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Aug  1 2006 Bill Nottingham <notting@redhat.com> 8.38-1
+- translation updates
+- bring down bonding slaves on ifdown (#199706)
+- support LINKDELAY for dhcp (#191137)
+- netfs: run multipath on netdev devices (#180977)
+- halt: use /proc/mounts instead of /etc/mtab (#198426, <mitr@redhat.com>)
+- rc.sysinit: fix getkey race (#191453, <mitr@redhat.com>)
+- spec cleanups (#188614, <kloczek@rudy.mif.pg.gda.pl>)
+- support aliases on vlan (#193133, <mitr@redhat.com>)
+- clean up ifcfg file handling (<mitr@redhat.com>, <michal@harddata.com>)
+- GRE and IPIP tunnel support (#168990, <mitr@redhat.com>,
+  <razvan.vilt@linux360.ro>, <aaron.hope@unh.edu>, <sean@enertronllc.com>)
+- rc.sysinit: don't format encrypted swap always (#127378)
+- don't try to add routes to alias devices (#199825, #195656)
+
 * Fri Jul 21 2006 Bill Nottingham <notting@redhat.com> 8.37-1
 - update translations
 
