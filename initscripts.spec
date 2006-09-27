@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.42
+Version: 8.43
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -48,7 +48,9 @@ make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandi
 %ifnarch s390 s390x
 rm -f \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-ctc \
- $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv
+ $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv \
+ $RPM_BUILD_ROOT/etc/udev/rules.d/55-ccw.rules \
+ $RPM_BUILD_ROOT/lib/udev/ccw_init
 %else
 rm -f \
  $RPM_BUILD_ROOT/etc/rc.d/rc.sysinit.s390init \
@@ -174,6 +176,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(2755,root,root) /sbin/netreport
 /sbin/initlog
 /lib/udev/rename_device
+%ifarch s390 s390x
+/lib/udev/ccw_init
+%endif
 /sbin/service
 /sbin/ppp-watch
 %{_mandir}/man*/*
@@ -194,6 +199,14 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Sep 27 2006 Bill Nottingham <notting@redhat.com> 8.43-1
+- move ccwgroup initialization to a udev rule (should fix #199139,
+  #199655, #169161)
+- init.d/functions: don't write to gdmfifo
+- remove unused-since-RHL-7 consolechars code, update docs (#206106)
+- stateless updates (#206331, <law@redhat.com>)
+- translation updates (el, ms, hr, sl)
+
 * Thu Sep 21 2006 Bill Nottingham <notting@redhat.com> 8.42-1
 - run rc.sysinit, /etc/rc in monitor mode (part of #184340)
 - use a better check for 'native' services (#190989, #110761, adapted
