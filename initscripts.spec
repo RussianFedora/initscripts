@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts.
 Name: initscripts
-Version: 8.45.3
+Version: 8.46
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -69,11 +69,10 @@ chmod 600 /var/log/btmp
 /sbin/chkconfig --add netfs
 /sbin/chkconfig --add network
 
-# Handle converting prefdm to run-once
-if fgrep -q "x:5:respawn:/etc/X11/prefdm -nodaemon" /etc/inittab ; then
-    sed --in-place=.rpmsave 's|^x:5:respawn:/etc/X11/prefdm -nodaemon|x:5:once:/etc/X11/prefdm -nodaemon|g' /etc/inittab
+# Handle converting prefdm back to respawn
+if fgrep -q "x:5:once:/etc/X11/prefdm -nodaemon" /etc/inittab ; then
+    sed --in-place=.rpmsave 's|^x:5:once:/etc/X11/prefdm -nodaemon|x:5:respawn:/etc/X11/prefdm -nodaemon|g' /etc/inittab
 fi
-
 
 %preun
 if [ $1 = 0 ]; then
@@ -145,6 +144,8 @@ rm -rf $RPM_BUILD_ROOT
 %endif
 /etc/rwtab
 %dir /etc/rwtab.d
+/etc/statetab
+%dir /etc/statetab.d
 /etc/udev/rules.d/*
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
@@ -199,12 +200,17 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Wed Oct 11 2006 Bill Nottingham <notting@redhat.com> 8.45.2-1
-- Handle "nodmraid" and "nompath" command line options (#209377, <pjones@redhat.com>)
-- translation updates: da, fi, zh_CN, ja
-
-* Mon Oct  9 2006 Bill Nottingham <notting@redhat.com> 8.45.1-1
-- restorecon on moved dhclient lease file (#209853)
+* Fri Oct 27 2006 Bill Nottingham <notting@redhat.com> 8.46-1
+- ifup-eth: restorecon on moved lease file
+- rc.sysinit: handle "nodmraid" and "nompath" command line options (#209377, <pjones@redhat.com>)
+- revert early-login support (#210836, essentially)
+- blacklist CJKI on the virtual console (#120819)
+- rc.sysinit: use dmraid.static (#211297)
+- use sysfs interface for bonding (#202443, <agospoda@redhat.com>)
+- use /etc/statetab, /etc/statetab.d for local state (#211839, <markmc@redhat.com>)
+- fix or_IN and similar locales (#212219)
+- use SUBCHANNELS as the primary key for s390 network devices (#204803)
+- translation updates
 
 * Fri Oct  6 2006 Bill Nottingham <notting@redhat.com> 8.45-1
 - lang.csh/lang.sh - do *not* stty iutf8; too much chaos with SIGTTOU
