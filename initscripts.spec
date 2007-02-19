@@ -1,6 +1,6 @@
-Summary: The inittab file and the /etc/init.d scripts.
+Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.49
+Version: 8.50
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -200,6 +200,18 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Feb 19 2007 Bill Nottingham <notting@redhat.com> 8.50-1
+- lang.csh, lang.sh: if $LANG is set, don't override it (#229102)
+- initlog.1: fix man page formatting (<esr@thyrsus.com>)
+- network-functions: simplify bonding test (#215887, <herbert.xu@redhat.com>)
+- fix ifup-post when lookup fails (#220318, <hiroshi.fujishima+redhat@gmail.com>)
+- add bridging docs (#221412, <markmc@redhat.com>)
+- release bonding slaves properly (#220525)
+- fix ppp-watch with ONBOOT=yes (#216749)
+- support VLAN_PLUS_VID_NO_PAD (#222975, #223011)
+- remove NETWORKING_IPV6; to disable, use a modprobe rule
+- translation updates: ms, de, el, pt_BR, fi, bs, sr, it, ko
+
 * Tue Dec 19 2006 Bill Nottingham <notting@redhat.com> 8.49-1
 - rc.sysinit: remove raidautorn (#219226)
 - ifup-eth: set MACADDR, MTU before initializing bonding slaves, etc (#218792)
@@ -1298,7 +1310,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Apr 19 2002 Bill Nottingham <notting@redhat.com> 6.67-1
 - fix silly cut&paste bug in hdparm settings in initscripts
 
-* Mon Apr 15 2002 Trond Eivind Glomsrød <teg@redhat.com> 6.65-1
+* Mon Apr 15 2002 Trond Eivind GlomsrÃ¸d <teg@redhat.com> 6.65-1
 - Update translations
 
 * Sun Apr 14 2002 Bill Nottingham <notting@redhat.com> 6.64-1
@@ -1533,7 +1545,7 @@ rm -rf $RPM_BUILD_ROOT
 - don't muck with /etc/issue each boot
 - big IPv6 update (<pekkas@netcore.fi>)
 
-* Fri Jul  6 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Fri Jul  6 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - Add new directories required by new network tool
 
 * Thu Jul 05 2001 Karsten Hopp <karsten@redhat.de>
@@ -1541,12 +1553,12 @@ rm -rf $RPM_BUILD_ROOT
 - Fix up kernel versioning on binary-only modules (S390)
 - don't use newt scripts on S390 console
 
-* Sat Jul 01 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Sat Jul 01 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - reenable pump, but make sure dhcpcd is the default. This
   way, upgrades of systems without dhcpcd has a better chance at
   working.
 
-* Thu Jun 28 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Thu Jun 28 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - Disable pump completely
 
 * Wed Jun 27 2001 Than Ngo <than@redhat.com>
@@ -1693,13 +1705,13 @@ rm -rf $RPM_BUILD_ROOT
 - don't display Japanese if we aren't on a pty (#25041)
 - load ide-scsi if passed on /proc/cmdline
 
-* Mon Feb  5 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Mon Feb  5 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - i18n updates
 
 * Fri Feb  2 2001 Bill Nottingham <notting@redhat.com>
 - actually *ship* the ipv6 (and plusb) files
 
-* Thu Feb  1 2001 Trond Eivind Glomsrød <teg@redhat.com>
+* Thu Feb  1 2001 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - i18n updates
 
 * Tue Jan 30 2001 Bill Nottingham <notting@redhat.com>
@@ -1810,7 +1822,7 @@ rm -rf $RPM_BUILD_ROOT
 - unmount usb filesystem on halt
 - run /sbin/ifup-pre-local if it exists
 
-* Tue Jul 18 2000 Trond Eivind Glomsrød <teg@redhat.com>
+* Tue Jul 18 2000 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - add "nousb" command line parameter
 - fix some warnings when mounting /proc/bus/usb
 
@@ -1845,14 +1857,14 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Jul 03 2000 Nalin Dahyabhai <nalin@redhat.com>
 - fix demand-dialing with PPP
 
-* Sun Jul 02 2000 Trond Eivind Glomsrød <teg@redhat.com>
+* Sun Jul 02 2000 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - don't use tail
 
-* Thu Jun 28 2000 Trond Eivind Glomsrød <teg@redhat.com>
+* Thu Jun 28 2000 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - add support for USB controllers and HID devices 
   (mice, keyboards)
 
-* Tue Jun 27 2000 Trond Eivind Glomsrød <teg@redhat.com>
+* Tue Jun 27 2000 Trond Eivind GlomsrÃ¸d <teg@redhat.com>
 - add support for EIDE optimization
 
 * Mon Jun 26 2000 Bill Nottingham <notting@redhat.com>
