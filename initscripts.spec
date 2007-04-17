@@ -1,11 +1,10 @@
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.51
+Version: 8.52
 License: GPL
 Group: System Environment/Base
 Release: 1
 Source: initscripts-%{version}.tar.bz2
-URL: http://fedora.redhat.com/projects/additional-projects/initscripts/
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -29,7 +28,7 @@ BuildRequires: glib2-devel popt gettext pkgconfig
 
 %description
 The initscripts package contains the basic system scripts used to boot
-your Red Hat system, change runlevels, and shut the system down
+your Red Hat or Fedora system, change runlevels, and shut the system down
 cleanly.  Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
 
@@ -68,6 +67,7 @@ chmod 600 /var/log/btmp
 
 /sbin/chkconfig --add netfs
 /sbin/chkconfig --add network
+/sbin/chkconfig --add netconsole
 
 # Handle converting prefdm back to respawn
 if fgrep -q "x:5:once:/etc/X11/prefdm -nodaemon" /etc/inittab ; then
@@ -78,6 +78,7 @@ fi
 if [ $1 = 0 ]; then
   /sbin/chkconfig --del netfs
   /sbin/chkconfig --del network
+  /sbin/chkconfig --del netconsole
 fi
 
 %triggerun -- initscripts < 7.62
@@ -93,6 +94,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/network-scripts
 %config(noreplace) %verify(not md5 mtime size) /etc/adjtime
 %config(noreplace) /etc/sysconfig/init
+%config(noreplace) /etc/sysconfig/netconsole
 %config(noreplace) /etc/sysconfig/readonly-root
 /etc/sysconfig/network-scripts/ifdown
 /sbin/ifdown
@@ -200,6 +202,24 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Apr 16 2007 Bill Nottingham <notting@redhat.com> 8.52-1
+- lang.sh: fix locales where SYSFONT is not the default (#229996)
+- ifup-wireless: properly quote arguments (#234756)
+- readonly-root: add options for mounting state (#234916)
+- rwtab: updates (#219339, <law@redhat.com>)
+- add netconsole init script (#235952)
+- disable link checking when PERSISTENT_DHCLIENT is set (#234075)
+- restore file context on /etc/resolv.conf (#230776, <dwalsh@redhat.com>)
+- ifup-post: only use the first address (#230157, <michal@harddata.com>)
+- ifup-ipsec: allow overriding of my_identifier (#229343, <cmadams@hiwaay.net>)
+- ifup-wireless: set link up before itweaking wireless parameters (#228253)
+- rc.sysinit: restorecon on mount points when relabeling (#220322)
+- init.ipv6-global: cleanup & optimize sysctl usage (#217595)
+- ifup-eth: support ETHTOOL_OPTS on bridge devices (#208043, <bbaetz@acm.org>)
+- network-functions-ipv6: as we don't use NETWORKING_IPV6, silence errors (#195845)
+- fix description (#229919)
+- translation updates
+
 * Fri Feb 23 2007 Bill Nottingham <notting@redhat.com> 8.51-1
 - fix 'Fedora Fedora' in rc.sysinit
 - halt: use kexec -x to not shut down network (#223932, <mchristi@redhat.com>)
