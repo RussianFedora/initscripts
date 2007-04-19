@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.52
+Version: 8.53
 License: GPL
 Group: System Environment/Base
 Release: 1
@@ -21,6 +21,7 @@ Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
 Conflicts: xorg-x11, glib2 < 2.11.1-2
+Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
@@ -202,6 +203,12 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Thu Apr 19 2007 Bill Nottingham <notting@redhat.com> 8.53-1
+- init.d/halt: use sound saving wrapper from alsa-utils, conflict with
+  older versions (#236916)
+- usernetctl: drop user gid (#229372)
+- translation updates: ta, pt_BR, nb, as, hi, de
+
 * Mon Apr 16 2007 Bill Nottingham <notting@redhat.com> 8.52-1
 - lang.sh: fix locales where SYSFONT is not the default (#229996)
 - ifup-wireless: properly quote arguments (#234756)
