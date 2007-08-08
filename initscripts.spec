@@ -1,3 +1,4 @@
+
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
 Version: 8.55
