@@ -3,8 +3,9 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 2
 Source: initscripts-%{version}.tar.bz2
+Patch0: initscripts-8.54.1-olpc.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -35,6 +36,7 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
+%patch0 -p1 -b .olpc
 
 %build
 make
@@ -65,10 +67,6 @@ touch /var/log/wtmp /var/run/utmp /var/log/btmp
 chown root:utmp /var/log/wtmp /var/run/utmp /var/log/btmp
 chmod 664 /var/log/wtmp /var/run/utmp
 chmod 600 /var/log/btmp
-
-/sbin/chkconfig --add netfs
-/sbin/chkconfig --add network
-/sbin/chkconfig --add netconsole
 
 # Handle converting prefdm back to respawn
 if fgrep -q "x:5:once:/etc/X11/prefdm -nodaemon" /etc/inittab ; then
@@ -201,8 +199,14 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
+/sbin/olpc-dm
 
 %changelog
+* Thu Aug 09 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-2
+- branch and optimize for olpc
+- add olpc-dm the new display manager for olpc
+- don't start netfs, network or netconsole anymore
+
 * Mon Jun 25 2007 Bill Nottingham <notting@redhat.com> 8.54.1-1
 - netfs: check for rpcbind, not portmap (#245595)
 
