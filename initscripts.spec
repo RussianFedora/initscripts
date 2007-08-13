@@ -204,6 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 %changelog
 * Mon Aug 13 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-3
 - fix rwtab to not have resolv.conf which screws up NetworkManager
+- don't print out tty in olpc-dm anymore
 
 * Thu Aug 09 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-2
 - branch and optimize for olpc

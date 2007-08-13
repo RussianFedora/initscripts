@@ -216,7 +216,7 @@
 +      tty_number = p;
 +    }
 +
-+  printf("TTY: %s\n", tty_name);
++ 
 +
 +  /* find names of Virtual Console devices, for later mode change */
 +  snprintf(vcsn, sizeof(vcsn), "/dev/vcs%s", tty_number);
