@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 2
+Release: 3
 Source: initscripts-%{version}.tar.bz2
 Patch0: initscripts-8.54.1-olpc.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
@@ -202,6 +202,9 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/olpc-dm
 
 %changelog
+* Mon Aug 13 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-3
+- fix rwtab to not have resolv.conf which screws up NetworkManager
+
 * Thu Aug 09 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-2
 - branch and optimize for olpc
 - add olpc-dm the new display manager for olpc
