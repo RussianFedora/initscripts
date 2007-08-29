@@ -1,10 +1,10 @@
-
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.55
-License: GPL
+Version: 8.56
+# ppp-watch is GPLv2+, everything else is GPLv2
+License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 3%{?dist}
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
@@ -17,12 +17,15 @@ Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/runuser
 Requires: udev >= 078-1
+Requires: popt >= 1.12-2
 Conflicts: mkinitrd < 4.0, kernel < 2.6.12
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
 Conflicts: xorg-x11, glib2 < 2.11.1-2
 Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
+# http://bugzilla.redhat.com/show_bug.cgi?id=252973
+Conflicts: nut < 2.2.0
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
@@ -198,18 +201,20 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ipv6-up
 %config /etc/ppp/ipv6-down
 %config /etc/initlog.conf
-%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6
+%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING
 /var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Wed Aug 29 2007 Fedora Release Engineering <rel-eng at fedoraproject dot org> - 8.55-3
-- s/popt/popt-devel/ in BuildRequires.
-
-* Wed Aug 29 2007 Fedora Release Engineering <rel-eng at fedoraproject dot org> - 8.55-2
-- Rebuild for selinux ppc32 issue.
+- rc.sysinit: optimize out some excess greps (<harald@redhat.com>)
+- halt: support newer nut syntax, conflict with old versions (#252973, <tsmetana@redhat.com>)
+- fix buildreq from popt -> popt-devel
+ - newer popt is in /lib|/lib64 - require it, and link dynamically
+- rc.sysinit: added support for cryptsetup-uuids (bug #242078, <harald@redhat.com>)
+- netconsole: fix status(), assorted other cleanups
+- translation updates: fr, ro, sk
 
 * Fri Jul 27 2007 Bill Nottingham <notting@redhat.com>
 - add /etc/networks (#239602)
