@@ -4,7 +4,7 @@ Name: initscripts
 Version: 8.55
 License: GPL
 Group: System Environment/Base
-Release: 2%{?dist}
+Release: 3%{?dist}
 Source: initscripts-%{version}.tar.bz2
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
@@ -26,7 +26,7 @@ Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
-BuildRequires: glib2-devel popt gettext pkgconfig
+BuildRequires: glib2-devel popt-devel gettext pkgconfig
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -205,6 +205,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Aug 29 2007 Fedora Release Engineering <rel-eng at fedoraproject dot org> - 8.55-3
+- s/popt/popt-devel/ in BuildRequires.
+
 * Wed Aug 29 2007 Fedora Release Engineering <rel-eng at fedoraproject dot org> - 8.55-2
 - Rebuild for selinux ppc32 issue.
 
