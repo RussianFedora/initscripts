@@ -4,7 +4,7 @@ Name: initscripts
 Version: 8.55
 License: GPL
 Group: System Environment/Base
-Release: 1
+Release: 2%{?dist}
 Source: initscripts-%{version}.tar.bz2
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
@@ -205,6 +205,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Aug 29 2007 Fedora Release Engineering <rel-eng at fedoraproject dot org> - 8.55-2
+- Rebuild for selinux ppc32 issue.
+
 * Fri Jul 27 2007 Bill Nottingham <notting@redhat.com>
 - add /etc/networks (#239602)
 - rc.sysinit: fix quotacheck, remove obsolete convertquota (#249003, <tometzky@batory.org.pl>)
