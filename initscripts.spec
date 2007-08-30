@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 4
+Release: 5 
 Source: initscripts-%{version}.tar.bz2
 Patch0: initscripts-8.54.1-olpc.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
@@ -202,6 +202,9 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/olpc-dm
 
 %changelog
+* Thu Aug 30 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-5
+- remove /etc/mtab and /etc/fstab from /etc/rwtab
+
 * Mon Aug 13 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-4
 - update the olpc patch to include /home/olpc/.Xauthority in rwtab
 
