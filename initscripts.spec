@@ -3,8 +3,9 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 5 
+Release: 6%{?dist} 
 Source: initscripts-%{version}.tar.bz2
+Source1: olpc-login
 Patch0: initscripts-8.54.1-olpc.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
@@ -44,6 +45,9 @@ make
 %install
 rm -rf $RPM_BUILD_ROOT
 make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} install
+
+mkdir -p $RPM_BUILD_ROOT/etc/pam.d/
+cp -f %{SOURCE1} $RPM_BUILD_ROOT/etc/pam.d/
 
 %find_lang %{name}
 
@@ -200,8 +204,14 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 /sbin/olpc-dm
+%{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Tue Sep 11 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-6
+- clean up olpc-dm
+- make sure olpc-dm sources /etc/sysconfig/i18n
+- add an olpc-login pam control file to avoid unneeded checks
+
 * Thu Aug 30 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-5
 - remove /etc/mtab and /etc/fstab from /etc/rwtab
 

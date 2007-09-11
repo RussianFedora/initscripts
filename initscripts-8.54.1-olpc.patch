@@ -1,6 +1,6 @@
 diff -up initscripts-8.54.1/rwtab.olpc initscripts-8.54.1/rwtab
 --- initscripts-8.54.1/rwtab.olpc	2007-04-13 18:44:55.000000000 -0400
-+++ initscripts-8.54.1/rwtab	2007-08-30 18:34:28.000000000 -0400
++++ initscripts-8.54.1/rwtab	2007-09-11 18:23:52.000000000 -0400
 @@ -24,10 +24,7 @@ empty	/var/tux
  empty	/media
  
@@ -19,7 +19,7 @@ diff -up initscripts-8.54.1/rwtab.olpc initscripts-8.54.1/rwtab
 +files   /home/olpc/.Xauthority
 diff -up initscripts-8.54.1/inittab.olpc initscripts-8.54.1/inittab
 --- initscripts-8.54.1/inittab.olpc	2006-10-12 13:51:04.000000000 -0400
-+++ initscripts-8.54.1/inittab	2007-08-30 18:33:15.000000000 -0400
++++ initscripts-8.54.1/inittab	2007-09-11 18:23:52.000000000 -0400
 @@ -15,7 +15,7 @@
  #   5 - X11
  #   6 - reboot (Do NOT set initdefault to this)
@@ -43,9 +43,9 @@ diff -up initscripts-8.54.1/inittab.olpc initscripts-8.54.1/inittab
 -x:5:respawn:/etc/X11/prefdm -nodaemon
 +x:5:respawn:/sbin/olpc-dm
 diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
---- /dev/null	2007-08-29 13:13:59.090486248 -0400
-+++ initscripts-8.54.1/src/olpc-dm.c	2007-08-30 18:33:15.000000000 -0400
-@@ -0,0 +1,595 @@
+--- /dev/null	2007-09-11 11:59:20.755757520 -0400
++++ initscripts-8.54.1/src/olpc-dm.c	2007-09-11 18:29:19.000000000 -0400
+@@ -0,0 +1,568 @@
 +#include <unistd.h>
 +#include <stdio.h>
 +#include <stdlib.h>
@@ -173,6 +173,69 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +  return 0;
 +}
 +
++/* strip comments and leading white space*/
++char *
++strip(char *src)
++{
++  int tpos=0;
++  int len;
++  int i;
++  int first_char_found=0;
++  char *result;
++ 
++  len = strlen(src);
++  result = (char *)malloc(len);
++  
++  for (i=0; i < len; i++)
++    {
++      if (!first_char_found && !isblank((int)src[i]))
++        first_char_found = 1;
++
++      if (first_char_found)
++        {
++          if (src[i] == (int)'#')
++            break;
++
++          result[tpos] = src[i];
++          tpos++;
++        }
++    }
++
++  if (tpos == 0)
++    {
++      /* blank line */
++      free(result);
++      result = NULL;
++    }
++  else
++    result[tpos]='\0';
++
++  return result;
++}
++
++void 
++source_i18n(void)
++{
++  FILE *f;
++  char *line;
++
++  f = fopen("/etc/sysconfig/i18n", "r");
++  while(fscanf(f, "%as", &line)==1)
++    {
++      char *sline;
++ 
++      sline = strip(line);
++      if (sline == NULL)
++        continue;
++
++      putenv(sline);
++
++      free(line);
++    }
++ 
++  fclose(f);
++}
++
 +void
 +olpc_login(void)
 +{
@@ -212,73 +275,24 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +   *     seteuid olpc -> start clients
 +   */ 
 +  ttyn = "/dev/tty2";
-+
-+  if (strncmp(ttyn, "/dev/", 5) == 0)
-+    tty_name = ttyn+5;
-+  else
-+    tty_name = ttyn;
-+
-+  if (strncmp(ttyn, "/dev/tty", 8) == 0)
-+    tty_number = ttyn+8;
-+  else 
-+    {
-+      char *p = ttyn;
-+      while (*p && !isdigit(*p)) p++;
-+      tty_number = p;
-+    }
-+
-+  printf("TTY: %s\n", tty_name);
-+
-+  /* find names of Virtual Console devices, for later mode change */
-+  snprintf(vcsn, sizeof(vcsn), "/dev/vcs%s", tty_number);
-+  snprintf(vcsan, sizeof(vcsan), "/dev/vcsa%s", tty_number);
++  tty_number = "2";
 +
 +  /* set pgid to pid */
 +  setpgrp();
 +  /* this means that setsid() will fail */
 +  
-+  {
-+    struct termios tt, ttt;
-+	
-+    tcgetattr(0, &tt);
-+    ttt = tt;
-+    ttt.c_cflag &= ~HUPCL;
++  openlog("olpc-login", LOG_ODELAY, LOG_AUTHPRIV);
 +
-+    /* These can fail, e.g. with ttyn on a read-only filesystem */
-+    chown(ttyn, 0, 0);
-+    chmod(ttyn, TTY_MODE);
-+
-+    /* Kill processes left on this tty */
-+    tcsetattr(0,TCSAFLUSH,&ttt);
-+    signal(SIGHUP, SIG_IGN); /* so vhangup() wont kill us */
-+    vhangup();
-+    signal(SIGHUP, SIG_DFL);
-+
-+    /* open stdin,stdout,stderr to the tty */
-+    opentty(ttyn);
-+	
-+    /* restore tty modes */
-+    tcsetattr(0,TCSAFLUSH,&tt);
-+  }
-+
-+  openlog("login", LOG_ODELAY, LOG_AUTHPRIV);
-+
-+  retcode = pam_start("login", OLPC_USER, &conv, &pamh);
++  retcode = pam_start("olpc-login", OLPC_USER, &conv, &pamh);
 +  if(retcode != PAM_SUCCESS) 
 +    {
-+      fprintf(stderr, "login: PAM Failure, aborting: %s\n",
++      fprintf(stderr, "olpc-login: PAM Failure, aborting: %s\n",
 +              pam_strerror(pamh, retcode));
 +      syslog(LOG_ERR, "Couldn't initialize PAM: %s",
 +             pam_strerror(pamh, retcode));
 +      exit(99);
 +    }
-+  /* hostname & tty are either set to NULL or their correct values,
-+     depending on how much we know */
-+  retcode = pam_set_item(pamh, PAM_RHOST, hostname);
-+  PAM_FAIL_CHECK;
 +  retcode = pam_set_item(pamh, PAM_TTY, tty_name);
-+  PAM_FAIL_CHECK;
-+  retcode = pam_set_item(pamh, PAM_USER_PROMPT, "You shouldn't see this login prompt");
 +  PAM_FAIL_CHECK;
 +
 +  /*
@@ -333,7 +347,7 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +  if (!pwd->pw_name || !pwd->pw_passwd || !pwd->pw_gecos ||
 +	!pwd->pw_dir || !pwd->pw_shell) 
 +    {
-+      fprintf(stderr, "login: Out of memory\n");
++      fprintf(stderr, "olpc-login: Out of memory\n");
 +      syslog(LOG_ERR, "Out of memory");
 +      pam_end(pamh, PAM_SYSTEM_ERR);
 +      exit(1);
@@ -460,53 +474,18 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +    updwtmp(_PATH_WTMP, &ut);
 +  }
 +
-+  chown(ttyn, pwd->pw_uid,
-+	(gr = getgrnam(TTYGRPNAME)) ? gr->gr_gid : pwd->pw_gid);
-+  chmod(ttyn, TTY_MODE);
-+
-+  /* if tty is one of the VC's then change owner and mode of the 
-+     special /dev/vcs devices as well */
-+  if (consoletty(0)) 
-+    {
-+      chown(vcsn, pwd->pw_uid, (gr ? gr->gr_gid : pwd->pw_gid));
-+      chown(vcsan, pwd->pw_uid, (gr ? gr->gr_gid : pwd->pw_gid));
-+      chmod(vcsn, TTY_MODE);
-+      chmod(vcsan, TTY_MODE);
-+    }
-+
-+
 +  setgid(pwd->pw_gid);
 +  
-+  if (*pwd->pw_shell == '\0')
-+    pwd->pw_shell = _PATH_BSHELL;
-+
-+  {
-+    char *ep;
-+	
-+    if(!((ep = getenv("TERM")) && (termenv = strdup(ep))))
-+      termenv = "dumb";
-+  }
-+ 
-+ 
 +  environ = (char**)malloc(sizeof(char*));
 +  memset(environ, 0, sizeof(char*));
-+  
++ 
++  source_i18n();
++ 
 +  setenv("HOME", pwd->pw_dir, 0);    /* legal to override */
 +  setenv("PATH", _PATH_DEFPATH, 1);
 +  
 +  setenv("SHELL", pwd->pw_shell, 1);
-+  setenv("TERM", termenv, 1);
-+  
-+  /* mailx will give a funny error msg if you forget this one */
-+  {
-+    char tmp[MAXPATHLEN];
-+    /* avoid snprintf */
-+    if (sizeof(_PATH_MAILDIR) + strlen(pwd->pw_name) + 1 < MAXPATHLEN) 
-+      {
-+        sprintf(tmp, "%s/%s", _PATH_MAILDIR, pwd->pw_name);
-+        setenv("MAIL",tmp,0);
-+      }
-+  }
++  /*setenv("TERM", termenv, 1);*/
 +  
 +  /* LOGNAME is not documented in login(1) but
 +     HP-UX 6.5 does it. We'll not allow modifying it.
@@ -524,9 +503,6 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +      }
 +  }
 +
-+  if (!strncmp(tty_name, "ttyS", 4))
-+    syslog(LOG_INFO, "DIALUP AT %s BY %s", tty_name, pwd->pw_name);
-+  
 +  /* allow tracking of good logins.
 +     -steve philp (sphilp@mail.alliance.net) */
 +  
@@ -562,7 +538,7 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +    {
 +      int errsv = errno;
 +      /* error in fork() */
-+      fprintf(stderr, "login: failure forking: %s", strerror(errsv));
++      fprintf(stderr, "olpc-login: failure forking: %s", strerror(errsv));
 +      PAM_END;
 +      exit(0);
 +    }
@@ -574,7 +550,7 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +      sigaction(SIGQUIT, &sa, NULL);
 +      sigaction(SIGINT, &sa, NULL);
 +      while(wait(NULL) == -1 && errno == EINTR) /**/ ;
-+      openlog("login", LOG_ODELAY, LOG_AUTHPRIV);
++      openlog("olpc-login", LOG_ODELAY, LOG_AUTHPRIV);
 +      PAM_END;
 +      exit(0);
 +    }
@@ -594,7 +570,7 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +  setsid();
 +
 +  /* make sure we have a controlling tty */
-+  openlog("login", LOG_ODELAY, LOG_AUTHPRIV);	/* reopen */
++  openlog("olpc-login", LOG_ODELAY, LOG_AUTHPRIV);	/* reopen */
 +
 +  /*
 +   * TIOCSCTTY: steal tty from other process group.
@@ -636,14 +612,11 @@ diff -up /dev/null initscripts-8.54.1/src/olpc-dm.c
 +  /* Use PAM to login as user*/
 +  olpc_login (); 
 +
-+  /* fork and exec startx. wait on child to cleanup */ 
-+  execl("/usr/bin/startx", "startx", "--", "-fp", "built-ins", "-wr", NULL);
-+
 +  return 0;
 +}
 diff -up initscripts-8.54.1/src/Makefile.olpc initscripts-8.54.1/src/Makefile
 --- initscripts-8.54.1/src/Makefile.olpc	2006-09-27 15:59:05.000000000 -0400
-+++ initscripts-8.54.1/src/Makefile	2007-08-30 18:33:15.000000000 -0400
++++ initscripts-8.54.1/src/Makefile	2007-09-11 18:23:52.000000000 -0400
 @@ -1,7 +1,8 @@
  CFLAGS+=$(RPM_OPT_FLAGS) -Wall -D_GNU_SOURCE
  
