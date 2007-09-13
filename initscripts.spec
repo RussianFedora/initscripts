@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 6%{?dist} 
+Release: 7%{?dist} 
 Source: initscripts-%{version}.tar.bz2
 Source1: olpc-login
 Patch0: initscripts-8.54.1-olpc.patch
@@ -207,6 +207,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Thu Sep 11 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-7
+- fix crasher bug in olpc-dm
+
 * Tue Sep 11 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-6
 - clean up olpc-dm
 - make sure olpc-dm sources /etc/sysconfig/i18n
