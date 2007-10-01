@@ -1,0 +1,51 @@
+diff -up initscripts-8.54.1/rwtab.readonly initscripts-8.54.1/rwtab
+--- initscripts-8.54.1/rwtab.readonly	2007-04-13 18:44:55.000000000 -0400
++++ initscripts-8.54.1/rwtab	2007-09-27 13:57:37.000000000 -0400
+@@ -24,10 +24,7 @@ empty	/var/tux
+ empty	/media
+ 
+ files	/etc/adjtime
+-files	/etc/fstab
+-files	/etc/mtab
+ files	/etc/ntp.conf
+-files	/etc/resolv.conf
+ files	/etc/lvm/.cache
+ files	/etc/lvm/archive
+ files	/etc/lvm/backup
+@@ -38,3 +35,4 @@ files	/var/lib/iscsi
+ files	/var/lib/logrotate.status
+ files	/var/lib/ntp
+ files	/var/lib/xen
++files   /home/olpc/.Xauthority
+diff -up initscripts-8.54.1/statetab.readonly initscripts-8.54.1/statetab
+--- initscripts-8.54.1/statetab.readonly	2006-10-27 13:02:22.000000000 -0400
++++ initscripts-8.54.1/statetab	2007-09-27 14:20:11.000000000 -0400
+@@ -10,3 +10,8 @@
+ #   /etc/ssh
+ #   /var/spool/mail
+ #
++/etc/ssh
++/etc/sysconfig/i18n
++/etc/timezone
++/var/lib/dbus
++/var/lib/random-seed
+diff -up initscripts-8.54.1/sysconfig/readonly-root.readonly initscripts-8.54.1/sysconfig/readonly-root
+--- initscripts-8.54.1/sysconfig/readonly-root.readonly	2007-04-13 18:48:20.000000000 -0400
++++ initscripts-8.54.1/sysconfig/readonly-root	2007-09-27 14:17:39.000000000 -0400
+@@ -2,7 +2,7 @@
+ READONLY=no
+ # Set to 'yes' to mount various temporary state as either tmpfs
+ # or on the block device labelled RW_LABEL. Implied by READONLY
+-TEMPORARY_STATE=no
++TEMPORARY_STATE=yes
+ # Place to put a tmpfs for temporary scratch writable space
+ RW_MOUNT=/var/lib/stateless/writable
+ # Label on local filesystem which can be used for temporary scratch space
+@@ -12,6 +12,6 @@ RW_OPTIONS=
+ # Label for partition with persistent data
+ STATE_LABEL=stateless-state
+ # Where to mount to the persistent data
+-STATE_MOUNT=/var/lib/stateless/state
++STATE_MOUNT=/security/state
+ # Options to use for peristent mount
+ STATE_OPTIONS=

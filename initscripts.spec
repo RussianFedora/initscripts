@@ -3,10 +3,13 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 8%{?dist} 
+Release: 9%{?dist} 
 Source: initscripts-%{version}.tar.bz2
 Source1: olpc-login
-Patch0: initscripts-8.54.1-olpc.patch
+Patch0: initscripts-8.54.1-dont-install-orig.patch
+Patch1: initscripts-8.54.1-olpc.patch
+Patch2: initscripts-8.54.1-readonly.patch
+Patch3: initscripts-8.54.1-prettyboot.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -37,7 +40,10 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
-%patch0 -p1 -b .olpc
+%patch0 -p1 -b .dont-install-orig
+%patch1 -p1 -b .olpc
+%patch2 -p1 -b .readonly
+%patch3 -p1 -b .prettyboot
 
 %build
 make

@@ -1,0 +1,58 @@
+diff -up initscripts-8.54.1/rc.d/rc.sysinit.prettyboot initscripts-8.54.1/rc.d/rc.sysinit
+--- initscripts-8.54.1/rc.d/rc.sysinit.prettyboot	2007-05-08 08:21:47.000000000 -0400
++++ initscripts-8.54.1/rc.d/rc.sysinit	2007-09-27 14:40:46.000000000 -0400
+@@ -11,6 +11,14 @@ unamer=`uname -r`
+ 
+ set -m
+ 
++if [ -x /usr/bin/rhgb-client ] ; then
++    # OLPC's rhgb-client depends on localhost being up
++    /sbin/ip addr add 127.0.0.1/8 dev lo
++    /sbin/ip addr add ::1/128 dev lo
++    /sbin/ip link set lo up
++    /usr/bin/rhgb-client --update=sysinit-top # early "we're alive" indication
++fi
++
+ if [ -f /etc/sysconfig/network ]; then
+     . /etc/sysconfig/network
+ fi
+@@ -228,9 +236,10 @@ init_crypto() {
+     return $ret
+ }
+ 
+-if [ -x /sbin/setsysfont -a -c /dev/tty1 ]; then
+-   /sbin/setsysfont < /dev/tty1 > /dev/tty1 2>/dev/null
+-fi
++# OLPC does the setsysfont later, in z-boot-anim-stop after DCON is frozen.
++#if [ -x /sbin/setsysfont -a -c /dev/tty1 ]; then
++#   /sbin/setsysfont < /dev/tty1 > /dev/tty1 2>/dev/null
++#fi
+ 
+ # Print a text banner.
+ echo -en $"\t\tWelcome to "
+@@ -327,10 +336,13 @@ if [ -x /bin/taskset ]; then
+    fi
+ fi
+ 
++update_boot_stage udev
++( sleep 3 ; update_boot_stage udev_mid ) &
+ nashpid=$(pidof nash 2>/dev/null)
+ [ -n "$nashpid" ] && kill $nashpid >/dev/null 2>&1
+ unset nashpid
+ /sbin/start_udev
++update_boot_stage udev_post
+ 
+ # Load other user-defined modules
+ for file in /etc/sysconfig/modules/*.modules ; do
+diff -up initscripts-8.54.1/rc.d/rc.prettyboot initscripts-8.54.1/rc.d/rc
+--- initscripts-8.54.1/rc.d/rc.prettyboot	2007-09-27 14:38:55.000000000 -0400
++++ initscripts-8.54.1/rc.d/rc	2007-09-27 14:40:10.000000000 -0400
+@@ -31,6 +31,8 @@ export runlevel previous
+ if [ "$previous" = "N" ]; then
+ 	if [ -f /var/run/confirm ]; then
+ 		echo $"Entering interactive startup"
++		# bail out of pretty boot
++		chvt 1
+ 	else
+ 		echo $"Entering non-interactive startup"
+ 	fi
