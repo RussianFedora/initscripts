@@ -213,6 +213,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Mon Oct  1 2007  <cscott@laptop.org> - 8.54.1-9
+- Create /etc/statetab; pretty boot improvements.
+
 * Tue Sep 18 2007 John (J5) Palmieri <johnp@redhat.com> 8.54.1-8
 - don't crash if /etc/sysconfig/i18n does not exist
 
