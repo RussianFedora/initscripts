@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.58
+Version: 8.59
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -208,17 +208,24 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Oct  8 2007 Bill Nottingham <notting@redhat.com> - 8.59-1
+- rc.sysinit: fix rhgb check
+- prefdm: add wdm section (#248087)
+- init.d/functions, halt: clean up some extraneous delays (#219816)
+- ifup-wireless: set mode before bringing link up (#254046, <linville@redhat.com>)
+- translation updates: pt_BR, hr
+
 * Fri Oct  5 2007 Bill Nottingham <notting@redhat.com> - 8.58-1
 - revert kernel conflict so that xen can still work (#319401)
 - rename_device, 60-net.rules: only suggest an interface name (part of #264901)
 - require newer udev for persistent net rules (part of #264901)
 - don't hang if someone puts a dangling pipe in /etc/rhgb/temp (#251219)
 - genhostid: fix for 64-bit systems (#306811)
-- more bash matching fixes (#220887)
+- more bash matching fixes (#220087)
 - translation updates: is, nb
 
 * Tue Sep 25 2007 Bill Nottingham <notting@redhat.com> - 8.57-1
-- work around upstream bash changes (#220887, modified from <nvigier@mandriva.com>)
+- work around upstream bash changes (#220087, modified from <nvigier@mandriva.com>)
 - init.d/network: add Should-Start for firewall services
 - ifup-eth: handle arp_ip_target separately (#288151, <agospoda@redhat.com>)
 - rc.sysinit: remove rc.serial support - should be udev rules
