@@ -12,11 +12,6 @@ diff -up initscripts-8.54.1/rwtab.readonly initscripts-8.54.1/rwtab
  files	/etc/lvm/.cache
  files	/etc/lvm/archive
  files	/etc/lvm/backup
-@@ -38,3 +35,4 @@ files	/var/lib/iscsi
- files	/var/lib/logrotate.status
- files	/var/lib/ntp
- files	/var/lib/xen
-+files   /home/olpc/.Xauthority
 diff -up initscripts-8.54.1/statetab.readonly initscripts-8.54.1/statetab
 --- initscripts-8.54.1/statetab.readonly	2006-10-27 13:02:22.000000000 -0400
 +++ initscripts-8.54.1/statetab	2007-09-27 14:20:11.000000000 -0400
