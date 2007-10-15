@@ -21,6 +21,7 @@ Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/runuser
 Requires: udev >= 078-1
+Requires: olpc-utils >= 0.20
 Conflicts: mkinitrd < 4.0, kernel < 2.6.12
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
@@ -212,8 +213,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Fri Oct 12 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-12
+- Require olpc-utils for olpc-dm
+- olpc-dm now lives in /usr/sbin
+
 * Fri Oct 12 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-11
-- Drop olpc-dm: it is now in olpc-dm.
+- Drop olpc-dm: it is now in olpc-dm
 
 * Fri Oct 12 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-10
 - Don't bind-mount /home/olpc/.Xauthority: unbreaks alternate boot
