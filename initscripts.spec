@@ -209,11 +209,13 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
-/sbin/olpc-dm
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
-* Fri Oct 12 2007  <bernie@codewiz.org> - 8.54.1-10
+* Fri Oct 12 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-11
+- Drop olpc-dm: it is now in olpc-dm.
+
+* Fri Oct 12 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-10
 - Don't bind-mount /home/olpc/.Xauthority: unbreaks alternate boot
 
 * Mon Oct  1 2007  <cscott@laptop.org> - 8.54.1-9
