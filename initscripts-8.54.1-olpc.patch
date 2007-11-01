@@ -23,4 +23,4 @@ diff -up initscripts-8.54.1/inittab.olpc initscripts-8.54.1/inittab
  
  # Run xdm in runlevel 5
 -x:5:respawn:/etc/X11/prefdm -nodaemon
-+x:5:once:/usr/sbin/olpc-dm
++x:5:respawn:/usr/sbin/olpc-dm

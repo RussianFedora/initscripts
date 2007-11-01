@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 12%{?dist} 
+Release: 13%{?dist} 
 Source: initscripts-%{version}.tar.bz2
 Source1: olpc-login
 Patch0: initscripts-8.54.1-dont-install-orig.patch
@@ -213,6 +213,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Fri Nov 01 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-13
+- Re-enable olpc-dm respawn due to popular demand
+
 * Fri Oct 12 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-12
 - Require olpc-utils for olpc-dm
 - olpc-dm now lives in /usr/sbin
