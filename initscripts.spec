@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 13%{?dist} 
+Release: 14%{?dist} 
 Source: initscripts-%{version}.tar.bz2
 Source1: olpc-login
 Patch0: initscripts-8.54.1-dont-install-orig.patch
@@ -17,11 +17,12 @@ Requires: /sbin/fuser, /bin/grep
 Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 3.0, SysVinit >= 2.85-38
-Requires: /sbin/ip, /sbin/arping, net-tools
+Requires: /sbin/ip, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/runuser
 Requires: udev >= 078-1
 Requires: olpc-utils >= 0.20
+Requires: popt >= 1.12-2
 Conflicts: mkinitrd < 4.0, kernel < 2.6.12
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
@@ -31,7 +32,7 @@ Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
-BuildRequires: glib2-devel popt gettext pkgconfig pam-devel
+BuildRequires: glib2-devel gettext pkgconfig
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -213,6 +214,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Tue Dec 25 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-14
+- Update dependencies
+- Happy holidays!
+
 * Fri Nov 01 2007  Bernardo Innocenti <bernie@codewiz.org> - 8.54.1-13
 - Re-enable olpc-dm respawn due to popular demand
 
