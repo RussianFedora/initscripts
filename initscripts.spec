@@ -216,7 +216,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
-* Wed Jan 02 2007  Bernardo Innocenti <bernie@codewiz.org> 8.54.1-15
+* Wed Jan 02 2008  Bernardo Innocenti <bernie@codewiz.org> 8.54.1-15
 - Rebuild
 
 * Tue Dec 25 2007  Bernardo Innocenti <bernie@codewiz.org> 8.54.1-14
