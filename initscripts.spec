@@ -216,6 +216,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Wed Jan 10 2008  Bernardo Innocenti <bernie@codewiz.org> 8.54.1-16
+- dlo#5879, dlo#5705, dlo#5537, dlo#5058: Automatic root login in the console
+
 * Wed Jan 02 2008  Bernardo Innocenti <bernie@codewiz.org> 8.54.1-15
 - Rebuild
 

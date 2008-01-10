@@ -13,13 +13,14 @@ diff -up initscripts-8.54.1/inittab.olpc initscripts-8.54.1/inittab
 @@ -44,10 +44,7 @@ pr:12345:powerokwait:/sbin/shutdown -c "
  # Run gettys in standard runlevels
 -1:2345:respawn:/sbin/mingetty tty1
-+1:2345:respawn:/sbin/mingetty --noclear tty1
- 2:2345:respawn:/sbin/mingetty tty2
+-2:2345:respawn:/sbin/mingetty tty2
 -3:2345:respawn:/sbin/mingetty tty3
 -4:2345:respawn:/sbin/mingetty tty4
 -5:2345:respawn:/sbin/mingetty tty5
 -6:2345:respawn:/sbin/mingetty tty6
-+3:2345:respawn:/sbin/agetty ttyS0 115200 vt100
++1:2345:respawn:/sbin/mingetty --pauselogin --autologin root --noclear tty1
++2:2345:respawn:/sbin/mingetty --pauselogin --autologin root --noclear tty2
++3:2345:respawn:/sbin/agetty -w -n ttyS0 115200 vt100
  
  # Run xdm in runlevel 5
 -x:5:respawn:/etc/X11/prefdm -nodaemon
