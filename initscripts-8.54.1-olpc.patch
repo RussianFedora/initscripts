@@ -18,8 +18,8 @@ diff -up initscripts-8.54.1/inittab.olpc initscripts-8.54.1/inittab
 -4:2345:respawn:/sbin/mingetty tty4
 -5:2345:respawn:/sbin/mingetty tty5
 -6:2345:respawn:/sbin/mingetty tty6
-+1:2345:respawn:/sbin/mingetty --pauselogin --autologin root --noclear tty1
-+2:2345:respawn:/sbin/mingetty --pauselogin --autologin root --noclear tty2
++1:2345:respawn:/sbin/mingetty --loginpause --autologin root --noclear tty1
++2:2345:respawn:/sbin/mingetty --loginpause --autologin root --noclear tty2
 +3:2345:respawn:/sbin/agetty -w -n ttyS0 115200 vt100
  
  # Run xdm in runlevel 5

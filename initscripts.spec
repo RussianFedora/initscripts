@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 16%{?dist} 
+Release: 17%{?dist} 
 Source: initscripts-%{version}.tar.bz2
 Source1: olpc-login
 Patch0: initscripts-8.54.1-dont-install-orig.patch
@@ -11,7 +11,7 @@ Patch1: initscripts-8.54.1-olpc.patch
 Patch2: initscripts-8.54.1-readonly.patch
 Patch3: initscripts-8.54.1-prettyboot.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
-Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
+Requires: mingetty >= 1.0.7-9, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
 Requires: /sbin/fuser, /bin/grep
 Requires: module-init-tools
@@ -216,6 +216,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Thu Jan 10 2008  Michael Stone <michael@laptop.org> 8.54.1-17
+- Correct Bernie's '--pauselogin' typo
+- Depend on a more specific version of mingetty supporting --loginpause
+
 * Wed Jan 10 2008  Bernardo Innocenti <bernie@codewiz.org> 8.54.1-16
 - dlo#5879, dlo#5705, dlo#5537, dlo#5058: Automatic root login in the console
 
