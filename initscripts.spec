@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.62
+Version: 8.63
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -19,7 +19,7 @@ Requires: ethtool >= 1.8-2, /sbin/runuser
 Requires: udev >= 115-1
 Requires: popt >= 1.12-2
 Requires: cpio, findutils
-Conflicts: mkinitrd < 4.0, kernel < 2.6.12
+Conflicts: mkinitrd < 4.0, kernel < 2.6.12, mdadm < 2.6.4-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
@@ -202,6 +202,9 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/ppp/ipv6-up
 %config /etc/ppp/ipv6-down
 %config /etc/initlog.conf
+%dir /etc/NetworkManager
+%dir /etc/NetworkManager/dispatcher.d
+/etc/NetworkManager/dispatcher.d/00-netreport
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING
 /var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
@@ -209,6 +212,11 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Feb  1 2008 Bill Nottingham <notting@redhat.com> - 8.63-1
+- don't start RAID arrays in rc.sysinit, that's done by udev (corollary of #429604)
+- add a NetworkManager-dispatcher script that does netreport on interface changes
+- use udev rules to set the clock, avoiding issues with modular rtcs (#290731)
+
 * Mon Jan 21 2008 Bill Nottingham <notting@redhat.com> - 8.62-1
 - rc.d/rc.sysinit: fix syntax error (#429556)
 - migrate sr@Latn -> sr@latin (<kmilos@gmail.com>)
