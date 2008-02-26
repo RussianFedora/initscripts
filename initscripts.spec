@@ -1,10 +1,10 @@
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.63
+Version: 8.64
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2
+Release: 1
 Source: initscripts-%{version}.tar.bz2
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
@@ -187,6 +187,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(2755,root,root) /sbin/netreport
 /sbin/initlog
 /lib/udev/rename_device
+/lib/udev/console_init
 %ifarch s390 s390x
 /lib/udev/ccw_init
 %endif
@@ -213,7 +214,8 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Mon Feb 25 2008 Bill Nottingham <notting@redhat.com>
+* Tue Feb 26 2008 Bill Nottingham <notting@redhat.com> - 8.64-1
+- Add a console_init udev helper to do console initialization
 - add /sbin/pidof requirement (#434863)
 
 * Fri Feb  1 2008 Bill Nottingham <notting@redhat.com> - 8.63-1
