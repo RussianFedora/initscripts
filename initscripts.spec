@@ -4,12 +4,13 @@ Version: 8.63
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1
+Release: 2
 Source: initscripts-%{version}.tar.bz2
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
 Requires: /sbin/fuser, /bin/grep
+Requires: /sbin/pidof
 Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 3.0, SysVinit >= 2.85-38
@@ -212,6 +213,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Feb 25 2008 Bill Nottingham <notting@redhat.com>
+- add /sbin/pidof requirement (#434863)
+
 * Fri Feb  1 2008 Bill Nottingham <notting@redhat.com> - 8.63-1
 - don't start RAID arrays in rc.sysinit, that's done by udev (corollary of #429604)
 - add a NetworkManager-dispatcher script that does netreport on interface changes
