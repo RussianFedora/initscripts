@@ -1,6 +1,6 @@
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.66
+Version: 8.67
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -28,7 +28,6 @@ Conflicts: xorg-x11, glib2 < 2.11.1-2
 Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
 # http://bugzilla.redhat.com/show_bug.cgi?id=252973
 Conflicts: nut < 2.2.0
-Conflicts: rhgb < 0.17.7-7
 Obsoletes: rhsound sapinit
 Obsoletes: hotplug
 Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
@@ -217,6 +216,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Mar 11 2008 Bill Nottingham <notting@redhat.com> - 8.67-1
+- actually, don't
+
 * Tue Mar 11 2008 Bill Nottingham <notting@redhat.com> - 8.66-1
 - use upstart to start rhgb (#433156, <cdahlin@ncsu.edu>)
 
