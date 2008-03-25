@@ -1,0 +1,26 @@
+--- initscripts-8.67/src/console_check.c.BAD	2008-03-25 09:26:45.000000000 -0500
++++ initscripts-8.67/src/console_check.c	2008-03-25 09:29:08.000000000 -0500
+@@ -48,6 +48,15 @@
+ 	{0, 0}
+ };
+ 
++#if defined(__sparc__)
++static int termcmp(struct termios *a, struct termios *b) 
++{
++        if (a->c_iflag != b->c_iflag || a->c_oflag != b->c_oflag ||
++            a->c_cflag != b->c_cflag || a->c_lflag != b->c_lflag)
++                return 1;
++        return memcmp(a->c_cc, b->c_cc, sizeof(a->c_cc));
++}
++#else
+ int termcmp(struct termios *a, struct termios *b) {
+ 	if (a->c_iflag != b->c_iflag || a->c_oflag != b->c_oflag ||
+ 	    a->c_cflag != b->c_cflag || a->c_lflag != b->c_lflag ||
+@@ -55,6 +64,7 @@
+ 		return 1;
+ 	return memcmp(a->c_cc, b->c_cc, sizeof(a->c_cc));
+ }       
++#endif
+ 
+ int get_serial_speed(int fd) {
+ 	struct termios mode;
