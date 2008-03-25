@@ -4,8 +4,10 @@ Version: 8.67
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1
+Release: 2
 Source: initscripts-%{version}.tar.bz2
+Patch0:   initscripts-8.67-sparc-console.patch
+
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -41,6 +43,7 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
+%patch0 -p1 
 
 %build
 make
@@ -216,6 +219,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Tue Mar 25 2008 Dennis Gilmore <dennis@ausil.us> - 8.67-2
+- apply patch for sparc console
+
 * Tue Mar 11 2008 Bill Nottingham <notting@redhat.com> - 8.67-1
 - actually, don't
 
