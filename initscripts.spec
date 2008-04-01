@@ -3,7 +3,7 @@ Name: initscripts
 Version: 8.54.1
 License: GPL
 Group: System Environment/Base
-Release: 17%{?dist} 
+Release: 18%{?dist} 
 Source: initscripts-%{version}.tar.bz2
 Source1: olpc-login
 Patch0: initscripts-8.54.1-dont-install-orig.patch
@@ -216,6 +216,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_sysconfdir}/pam.d/olpc-login
 
 %changelog
+* Thu Apr 01 2008  Michael Stone <michael@laptop.org> 8.54.1-18
+- Tell our agetty to login with /bin/bash now that we're locking the root account
+
 * Thu Jan 10 2008  Michael Stone <michael@laptop.org> 8.54.1-17
 - Correct Bernie's '--pauselogin' typo
 - Depend on a more specific version of mingetty supporting --loginpause
