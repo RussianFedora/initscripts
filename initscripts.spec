@@ -1,13 +1,13 @@
+%define with_upstart 1%{nil} 
+
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.67
+Version: 8.68
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2
+Release: 1
 Source: initscripts-%{version}.tar.bz2
-Patch0:   initscripts-8.67-sparc-console.patch
-
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -15,7 +15,12 @@ Requires: /sbin/fuser, /bin/grep
 Requires: /sbin/pidof
 Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
-Requires: bash >= 3.0, SysVinit >= 2.85-38
+Requires: bash >= 3.0
+%if with_upstart
+Requires: upstart
+%else
+Requires: SysVinit >= 2.85-38
+%endif
 Requires: /sbin/ip, /sbin/arping, net-tools
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/runuser
@@ -43,7 +48,6 @@ deactivate most network interfaces.
 
 %prep
 %setup -q
-%patch0 -p1 
 
 %build
 make
@@ -53,6 +57,13 @@ rm -rf $RPM_BUILD_ROOT
 make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandir} install
 
 %find_lang %{name}
+
+%if with_upstart
+ mv -f $RPM_BUILD_ROOT/etc/inittab.upstart $RPM_BUILD_ROOT/etc/inittab
+%else
+ mv -f $RPM_BUILD_ROOT/etc/inittab.sysv $RPM_BUILD_ROOT/etc/inittab
+%endif
+rm -f $RPM_BUILD_ROOT/etc/inittab.*
 
 %ifnarch s390 s390x
 rm -f \
@@ -188,6 +199,7 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/fstab-decode
 /sbin/genhostid
 /sbin/getkey
+/sbin/securetty
 %attr(2755,root,root) /sbin/netreport
 /sbin/initlog
 /lib/udev/rename_device
@@ -212,6 +224,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/NetworkManager
 %dir /etc/NetworkManager/dispatcher.d
 /etc/NetworkManager/dispatcher.d/00-netreport
+/etc/NetworkManager/dispatcher.d/05-netfs
 %doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING
 /var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
@@ -219,8 +232,23 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
-* Tue Mar 25 2008 Dennis Gilmore <dennis@ausil.us> - 8.67-2
-- apply patch for sparc console
+* Fri Apr  4 2008 Bill Nottingham <notting@redhat.com> - 8.68-1
+- netfs: umount 'ncp' filesystems as well (#437117)
+- improve performance of s390 ccw rules (#437110, <mernst@de.ibm.com>)
+- fix consoletype environment leak (#439546)
+- ifdown-eth: make sure NEWCONFIG exists before grepping for it (#390271, continued)
+- console_check: always open with NONBLOCK, clear the serial structs first,
+  handle non-16550 ports (<dwmw2@infradead.org>)
+- halt: don't use /etc/sysconfig/clock (#438337)
+- ifup: don't attempt to re-enslave already-enslaved devices (#440077)
+- netfs: run as a NetworkManagerDispatcher script (#439242)
+- netfs: remove $local_fs from the list of provides (making it implicitly provided
+  by booting)
+- serial: add a crude hack to wait for runlevels to finish (#437379)
+- serial: frob /etc/securetty when necessary (#437381)
+- add a upstart-specific inittab
+- translation updates: as, bn_IN, cs, de, es, fi, fr, gu, hi, it, ja, kn, ml, mr, nb,
+  nl, pa, pl, pt_BR, ru, sk, sr, ta, te, zh_CN
 
 * Tue Mar 11 2008 Bill Nottingham <notting@redhat.com> - 8.67-1
 - actually, don't
