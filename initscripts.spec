@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.72
+Version: 8.73
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -17,7 +17,8 @@ Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 3.0
 %if with_upstart
-Requires: upstart, event-compat-sysv >= 0.3.9-14
+Requires: upstart
+Obsoletes: event-compat-sysv
 %else
 Requires: SysVinit >= 2.85-38
 %endif
@@ -64,6 +65,7 @@ make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandi
  rm -f $RPM_BUILD_ROOT/etc/rc.d/init.d/single
 %else
  mv -f $RPM_BUILD_ROOT/etc/inittab.sysv $RPM_BUILD_ROOT/etc/inittab
+ rm -rf $RPM_BUILD_ROOT/etc/event.d
 %endif
 rm -f $RPM_BUILD_ROOT/etc/inittab.*
 
@@ -172,7 +174,9 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/rwtab.d
 /etc/statetab
 %dir /etc/statetab.d
+%if with_upstart
 %config(noreplace) /etc/event.d/*
+%endif
 /etc/udev/rules.d/*
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
@@ -227,13 +231,18 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/NetworkManager/dispatcher.d
 /etc/NetworkManager/dispatcher.d/00-netreport
 /etc/NetworkManager/dispatcher.d/05-netfs
-%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING
+%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING README-event.d
 /var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Apr 25 2008 Bill Nottingham <notting@redhat.com> - 8.73-1
+- move event-compat-sysv events here, obsolete it
+- fix ctrl-alt-del during rc.sysinit (#444050)
+- fix 'telinit X' from single-user mode (#444001)
+
 * Thu Apr 24 2008 Bill Nottingham <notting@redhat.com> - 8.72-1
 - don't have a S99single when using upstart (#444001, indirectly)
 
