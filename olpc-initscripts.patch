@@ -1,6 +1,6 @@
 diff -Nur initscripts-8.76.2-orig/event.d/olpc-dm initscripts-8.76.2/event.d/olpc-dm
 --- initscripts-8.76.2-orig/event.d/olpc-dm	1969-12-31 18:00:00.000000000 -0600
-+++ initscripts-8.76.2/event.d/olpc-dm	2008-05-15 23:21:20.000000000 -0500
++++ initscripts-8.76.2/event.d/olpc-dm	2008-05-15 23:24:24.000000000 -0500
 @@ -0,0 +1,12 @@
 +# olpc-dm - start the olpc sugar environment
 +#
@@ -30,6 +30,30 @@ diff -Nur initscripts-8.76.2-orig/event.d/prefdm initscripts-8.76.2/event.d/pref
 -respawn
 -respawn limit 10 120
 -exec /etc/X11/prefdm -nodaemon
+diff -Nur initscripts-8.76.2-orig/event.d/tty1 initscripts-8.76.2/event.d/tty1
+--- initscripts-8.76.2-orig/event.d/tty1	2008-05-15 11:19:26.000000000 -0500
++++ initscripts-8.76.2/event.d/tty1	2008-05-16 14:23:47.000000000 -0500
+@@ -6,7 +6,7 @@
+ start on stopped rc2
+ start on stopped rc3
+ start on stopped rc4
+-start on started prefdm
++start on started olpc-dm
+ 
+ stop on runlevel 0
+ stop on runlevel 1
+diff -Nur initscripts-8.76.2-orig/event.d/tty2 initscripts-8.76.2/event.d/tty2
+--- initscripts-8.76.2-orig/event.d/tty2	2008-05-15 11:19:26.000000000 -0500
++++ initscripts-8.76.2/event.d/tty2	2008-05-16 14:24:01.000000000 -0500
+@@ -6,7 +6,7 @@
+ start on stopped rc2
+ start on stopped rc3
+ start on stopped rc4
+-start on started prefdm
++start on started olpc-dm
+ 
+ stop on runlevel 0
+ stop on runlevel 1
 diff -Nur initscripts-8.76.2-orig/event.d/tty3 initscripts-8.76.2/event.d/tty3
 --- initscripts-8.76.2-orig/event.d/tty3	2008-05-15 11:19:26.000000000 -0500
 +++ initscripts-8.76.2/event.d/tty3	1969-12-31 18:00:00.000000000 -0600
@@ -112,17 +136,17 @@ diff -Nur initscripts-8.76.2-orig/event.d/tty6 initscripts-8.76.2/event.d/tty6
 -exec /sbin/mingetty tty6
 diff -Nur initscripts-8.76.2-orig/event.d/ttyS0 initscripts-8.76.2/event.d/ttyS0
 --- initscripts-8.76.2-orig/event.d/ttyS0	1969-12-31 18:00:00.000000000 -0600
-+++ initscripts-8.76.2/event.d/ttyS0	2008-05-15 23:19:25.000000000 -0500
++++ initscripts-8.76.2/event.d/ttyS0	2008-05-16 14:24:30.000000000 -0500
 @@ -0,0 +1,16 @@
 +# ttyS0 - getty
 +#
-+# This service maintains a getty on tty3 from the point the system is
++# This service maintains a getty on ttyS0 from the point the system is
 +# started until it is shut down again.
 +
 +start on stopped rc2
 +start on stopped rc3
 +start on stopped rc4
-+start on started prefdm
++start on started olpc-dm
 +
 +stop on runlevel 0
 +stop on runlevel 1
@@ -130,3 +154,9 @@ diff -Nur initscripts-8.76.2-orig/event.d/ttyS0 initscripts-8.76.2/event.d/ttyS0
 +
 +respawn
 +exec /sbin/agetty -w -n ttyS0 115200 vt100
+Binary files initscripts-8.76.2-orig/src/doexec and initscripts-8.76.2/src/doexec differ
+Binary files initscripts-8.76.2-orig/src/netreport and initscripts-8.76.2/src/netreport differ
+Binary files initscripts-8.76.2-orig/src/testd and initscripts-8.76.2/src/testd differ
+Binary files initscripts-8.76.2-orig/src/usernetctl and initscripts-8.76.2/src/usernetctl differ
+Binary files initscripts-8.76.2-orig/src/usernetctl.o and initscripts-8.76.2/src/usernetctl.o differ
+Binary files initscripts-8.76.2-orig/src/usleep.o and initscripts-8.76.2/src/usleep.o differ
