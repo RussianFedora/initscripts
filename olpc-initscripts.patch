@@ -1,60 +1,22 @@
-diff -Nur initscripts-8.76.2-orig/event.d/olpc-dm initscripts-8.76.2/event.d/olpc-dm
---- initscripts-8.76.2-orig/event.d/olpc-dm	1969-12-31 18:00:00.000000000 -0600
-+++ initscripts-8.76.2/event.d/olpc-dm	2008-05-15 23:24:24.000000000 -0500
-@@ -0,0 +1,12 @@
-+# olpc-dm - start the olpc sugar environment
-+#
-+# Starts olpc sugar 
-+
-+start on stopped rc5
-+
-+stop on runlevel [!5]
-+
-+console output
-+respawn
-+respawn limit 10 120
-+exec /usr/sbin/olpc-dm
-diff -Nur initscripts-8.76.2-orig/event.d/prefdm initscripts-8.76.2/event.d/prefdm
+diff -Nru initscripts-8.76.2-orig/event.d/prefdm initscripts-8.76.2/event.d/prefdm
 --- initscripts-8.76.2-orig/event.d/prefdm	2008-05-15 11:19:26.000000000 -0500
-+++ initscripts-8.76.2/event.d/prefdm	1969-12-31 18:00:00.000000000 -0600
-@@ -1,12 +0,0 @@
++++ initscripts-8.76.2/event.d/prefdm	2008-06-05 23:03:53.000000000 -0500
+@@ -1,6 +1,6 @@
 -# prefdm - preferred display manager
--#
++# prefdm - start the olpc sugar environment
+ #
 -# Starts gdm/xdm/etc by preference
--
--start on stopped rc5
--
--stop on runlevel [!5]
--
--console output
--respawn
--respawn limit 10 120
++# Starts olpc sugar 
+ 
+ start on stopped rc5
+ 
+@@ -9,4 +9,4 @@
+ console output
+ respawn
+ respawn limit 10 120
 -exec /etc/X11/prefdm -nodaemon
-diff -Nur initscripts-8.76.2-orig/event.d/tty1 initscripts-8.76.2/event.d/tty1
---- initscripts-8.76.2-orig/event.d/tty1	2008-05-15 11:19:26.000000000 -0500
-+++ initscripts-8.76.2/event.d/tty1	2008-05-16 14:23:47.000000000 -0500
-@@ -6,7 +6,7 @@
- start on stopped rc2
- start on stopped rc3
- start on stopped rc4
--start on started prefdm
-+start on started olpc-dm
- 
- stop on runlevel 0
- stop on runlevel 1
-diff -Nur initscripts-8.76.2-orig/event.d/tty2 initscripts-8.76.2/event.d/tty2
---- initscripts-8.76.2-orig/event.d/tty2	2008-05-15 11:19:26.000000000 -0500
-+++ initscripts-8.76.2/event.d/tty2	2008-05-16 14:24:01.000000000 -0500
-@@ -6,7 +6,7 @@
- start on stopped rc2
- start on stopped rc3
- start on stopped rc4
--start on started prefdm
-+start on started olpc-dm
- 
- stop on runlevel 0
- stop on runlevel 1
-diff -Nur initscripts-8.76.2-orig/event.d/tty3 initscripts-8.76.2/event.d/tty3
++exec /usr/sbin/olpc-dm
+diff -Nru initscripts-8.76.2-orig/event.d/tty3 initscripts-8.76.2/event.d/tty3
 --- initscripts-8.76.2-orig/event.d/tty3	2008-05-15 11:19:26.000000000 -0500
 +++ initscripts-8.76.2/event.d/tty3	1969-12-31 18:00:00.000000000 -0600
 @@ -1,16 +0,0 @@
@@ -74,7 +36,7 @@ diff -Nur initscripts-8.76.2-orig/event.d/tty3 initscripts-8.76.2/event.d/tty3
 -
 -respawn
 -exec /sbin/mingetty tty3
-diff -Nur initscripts-8.76.2-orig/event.d/tty4 initscripts-8.76.2/event.d/tty4
+diff -Nru initscripts-8.76.2-orig/event.d/tty4 initscripts-8.76.2/event.d/tty4
 --- initscripts-8.76.2-orig/event.d/tty4	2008-05-15 11:19:26.000000000 -0500
 +++ initscripts-8.76.2/event.d/tty4	1969-12-31 18:00:00.000000000 -0600
 @@ -1,16 +0,0 @@
@@ -94,7 +56,7 @@ diff -Nur initscripts-8.76.2-orig/event.d/tty4 initscripts-8.76.2/event.d/tty4
 -
 -respawn
 -exec /sbin/mingetty tty4
-diff -Nur initscripts-8.76.2-orig/event.d/tty5 initscripts-8.76.2/event.d/tty5
+diff -Nru initscripts-8.76.2-orig/event.d/tty5 initscripts-8.76.2/event.d/tty5
 --- initscripts-8.76.2-orig/event.d/tty5	2008-05-15 11:19:26.000000000 -0500
 +++ initscripts-8.76.2/event.d/tty5	1969-12-31 18:00:00.000000000 -0600
 @@ -1,16 +0,0 @@
@@ -114,7 +76,7 @@ diff -Nur initscripts-8.76.2-orig/event.d/tty5 initscripts-8.76.2/event.d/tty5
 -
 -respawn
 -exec /sbin/mingetty tty5
-diff -Nur initscripts-8.76.2-orig/event.d/tty6 initscripts-8.76.2/event.d/tty6
+diff -Nru initscripts-8.76.2-orig/event.d/tty6 initscripts-8.76.2/event.d/tty6
 --- initscripts-8.76.2-orig/event.d/tty6	2008-05-15 11:19:26.000000000 -0500
 +++ initscripts-8.76.2/event.d/tty6	1969-12-31 18:00:00.000000000 -0600
 @@ -1,16 +0,0 @@
@@ -134,9 +96,9 @@ diff -Nur initscripts-8.76.2-orig/event.d/tty6 initscripts-8.76.2/event.d/tty6
 -
 -respawn
 -exec /sbin/mingetty tty6
-diff -Nur initscripts-8.76.2-orig/event.d/ttyS0 initscripts-8.76.2/event.d/ttyS0
+diff -Nru initscripts-8.76.2-orig/event.d/ttyS0 initscripts-8.76.2/event.d/ttyS0
 --- initscripts-8.76.2-orig/event.d/ttyS0	1969-12-31 18:00:00.000000000 -0600
-+++ initscripts-8.76.2/event.d/ttyS0	2008-05-16 14:24:30.000000000 -0500
++++ initscripts-8.76.2/event.d/ttyS0	2008-06-05 23:04:38.000000000 -0500
 @@ -0,0 +1,16 @@
 +# ttyS0 - getty
 +#
@@ -146,7 +108,7 @@ diff -Nur initscripts-8.76.2-orig/event.d/ttyS0 initscripts-8.76.2/event.d/ttyS0
 +start on stopped rc2
 +start on stopped rc3
 +start on stopped rc4
-+start on started olpc-dm
++start on started prefdm
 +
 +stop on runlevel 0
 +stop on runlevel 1

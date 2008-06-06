@@ -6,7 +6,7 @@ Version: 8.76.2
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1.2%{?dist}
+Release: 1.3%{?dist}
 Source: initscripts-%{version}.tar.bz2
 Patch0: olpc-initscripts.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
@@ -240,6 +240,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Thu Jun 05 2008 Dennis Gilmore <dennis@ausil.us> - 8.76.2-1.3
+- update olpc patch
+
 * Thu May 15 2008 Dennis Gilmore <dennis@ausil.us> - 8.76.2-1.2
 - update patch for olpc
 
