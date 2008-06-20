@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.77
+Version: 8.78
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -238,6 +238,9 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Fri Jun 20 2008 Bill Nottingham <notting@redhat.com> - 8.78-1
+- fix mounting of /dev/pts
+
 * Thu Jun 19 2008 Bill Nottingham <notting@redhat.com> - 8.77-1
 - NMDispatcher/05-netfs: fix check for default route (#445509)
 - service: don't set $LANG, rely on it to inherit from system locales (#422141)
