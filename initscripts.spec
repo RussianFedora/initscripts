@@ -6,10 +6,12 @@ Version: 8.76.2
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}.4
+Release: 1%{?dist}.5
 Source: initscripts-%{version}.tar.bz2
 Patch0: olpc-initscripts.patch
 Patch1: olpc-autologin.patch
+Patch2: initscripts-8.76.2-readonly.patch
+Patch3: initscripts-8.76.2-prettyboot.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -53,6 +55,8 @@ deactivate most network interfaces.
 %setup -q
 %patch0 -p1 
 %patch1 -p1 
+%patch2 -p1 -b .readonly
+%patch3 -p1 -b .prettyboot
 
 %build
 make
@@ -242,6 +246,13 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Thu Jun 26 2008 C. Scott Ananian <cscott@laptop.org> - 8.76.2-1.5
+- Turn on stateless support for OLPC; preserve /etc/ssh, /etc/sysconfig/i18n,
+  /etc/timezone, /var/lib/dbus/machine-id, and /var/lib/random-seed.
+- Add better support for pretty boot: bring up localhost before rhgb-client
+  is invoked; some additional calls to rhgb-client; make sure that we cleanly
+  exit pretty boot if interactive boot mode is invoked.
+
 * Fri Jun 13 2008 Dennis Gilmore <dennis@ausil.us> - 8.76.2-1.4
 - add patch to autologin 
 

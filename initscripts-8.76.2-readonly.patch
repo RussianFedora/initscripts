@@ -1,0 +1,45 @@
+diff -ruHp initscripts-8.76.2.orig/rwtab initscripts-8.76.2/rwtab
+--- initscripts-8.76.2.orig/rwtab	2008-06-26 19:04:43.000000000 -0400
++++ initscripts-8.76.2/rwtab	2008-06-26 20:07:04.000000000 -0400
+@@ -24,9 +24,7 @@ empty	/var/tux
+ empty	/media
+ 
+ files	/etc/adjtime
+-files	/etc/mtab
+ files	/etc/ntp.conf
+-files	/etc/resolv.conf
+ files	/etc/lvm/.cache
+ files	/etc/lvm/archive
+ files	/etc/lvm/backup
+diff -ruHp initscripts-8.76.2.orig/statetab initscripts-8.76.2/statetab
+--- initscripts-8.76.2.orig/statetab	2008-06-26 19:04:43.000000000 -0400
++++ initscripts-8.76.2/statetab	2008-06-26 20:08:03.000000000 -0400
+@@ -10,3 +10,8 @@
+ #   /etc/ssh
+ #   /var/spool/mail
+ #
++/etc/ssh
++/etc/sysconfig/i18n
++/etc/timezone
++/var/lib/dbus
++/var/lib/random-seed
+diff -ruHp initscripts-8.76.2.orig/sysconfig/readonly-root initscripts-8.76.2/sysconfig/readonly-root
+--- initscripts-8.76.2.orig/sysconfig/readonly-root	2008-06-26 19:04:43.000000000 -0400
++++ initscripts-8.76.2/sysconfig/readonly-root	2008-06-26 20:08:03.000000000 -0400
+@@ -2,7 +2,7 @@
+ READONLY=no
+ # Set to 'yes' to mount various temporary state as either tmpfs
+ # or on the block device labelled RW_LABEL. Implied by READONLY
+-TEMPORARY_STATE=no
++TEMPORARY_STATE=yes
+ # Place to put a tmpfs for temporary scratch writable space
+ RW_MOUNT=/var/lib/stateless/writable
+ # Label on local filesystem which can be used for temporary scratch space
+@@ -12,6 +12,6 @@ RW_OPTIONS=
+ # Label for partition with persistent data
+ STATE_LABEL=stateless-state
+ # Where to mount to the persistent data
+-STATE_MOUNT=/var/lib/stateless/state
++STATE_MOUNT=/security/state
+ # Options to use for peristent mount
+ STATE_OPTIONS=
