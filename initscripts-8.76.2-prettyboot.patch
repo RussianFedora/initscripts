@@ -1,7 +1,15 @@
 diff -ruHp initscripts-8.76.2.orig/rc.d/rc initscripts-8.76.2/rc.d/rc
---- initscripts-8.76.2.orig/rc.d/rc	2008-06-26 19:04:43.000000000 -0400
-+++ initscripts-8.76.2/rc.d/rc	2008-06-26 20:12:30.000000000 -0400
-@@ -43,6 +43,8 @@ UPSTART=
+--- initscripts-8.76.2.orig/rc.d/rc	2008-06-27 17:03:36.000000000 -0400
++++ initscripts-8.76.2/rc.d/rc	2008-06-27 17:27:07.000000000 -0400
+@@ -29,6 +29,7 @@ export runlevel previous
+ 
+ export CONSOLETYPE
+ cmdline=$(cat /proc/cmdline)
++[ -x /etc/rc.d/init.d/0-boot-anim-start ] && cmdline="$cmdline rhgb"
+ if ! strstr "$cmdline" rhgb; then
+ 	GRAPHICAL="no"
+ 	export GRAPHICAL
+@@ -43,6 +44,8 @@ UPSTART=
  if [ "$previous" = "N" ]; then
  	if [ "$do_confirm" = "yes" ]; then
  		echo $"Entering interactive startup"
@@ -11,8 +19,8 @@ diff -ruHp initscripts-8.76.2.orig/rc.d/rc initscripts-8.76.2/rc.d/rc
  		echo $"Entering non-interactive startup"
  	fi
 diff -ruHp initscripts-8.76.2.orig/rc.d/rc.sysinit initscripts-8.76.2/rc.d/rc.sysinit
---- initscripts-8.76.2.orig/rc.d/rc.sysinit	2008-06-26 19:04:43.000000000 -0400
-+++ initscripts-8.76.2/rc.d/rc.sysinit	2008-06-26 20:12:30.000000000 -0400
+--- initscripts-8.76.2.orig/rc.d/rc.sysinit	2008-06-27 17:03:36.000000000 -0400
++++ initscripts-8.76.2/rc.d/rc.sysinit	2008-06-27 17:03:44.000000000 -0400
 @@ -11,6 +11,14 @@ unamer=`uname -r`
  
  set -m
