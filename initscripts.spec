@@ -6,7 +6,7 @@ Version: 8.76.2
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}.5
+Release: 1%{?dist}.6
 Source: initscripts-%{version}.tar.bz2
 Patch0: olpc-initscripts.patch
 Patch1: olpc-autologin.patch
@@ -246,6 +246,10 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Sat Jun 28 2008 C. Scott Ananian <cscott@laptop.org> - 8.76.2-1.6
+- Turn on graphical boot by default to generate proper rhgb messages for
+  pretty boot.
+
 * Thu Jun 26 2008 C. Scott Ananian <cscott@laptop.org> - 8.76.2-1.5
 - Turn on stateless support for OLPC; preserve /etc/ssh, /etc/sysconfig/i18n,
   /etc/timezone, /var/lib/dbus/machine-id, and /var/lib/random-seed.
