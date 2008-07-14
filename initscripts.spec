@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.78
+Version: 8.79
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -119,6 +119,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/network-scripts
 %config(noreplace) %verify(not md5 mtime size) /etc/adjtime
 %config(noreplace) /etc/sysconfig/init
+%config(noreplace) /etc/sysconfig/mcheck
 %config(noreplace) /etc/sysconfig/netconsole
 %config(noreplace) /etc/sysconfig/readonly-root
 /etc/sysconfig/network-scripts/ifdown
@@ -193,8 +194,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/rc.d/rc.local
 %config /etc/rc.d/rc.sysinit
 %config(noreplace) /etc/sysctl.conf
-%config /etc/profile.d/lang.sh
-%config /etc/profile.d/lang.csh
+%config /etc/profile.d/*
 /usr/sbin/sys-unconfig
 /sbin/setsysfont
 /bin/doexec
@@ -238,6 +238,14 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Mon Jul 14 2008 Bill Nottingham <notting@redhat.com> - 8.79-1
+- fix mcheck stuff to be installed correctly
+- don't do an arping check for loopback interfaces
+- console_init: don't wait (<arjan@infradead.org>)
+- rc: clean up extraneous set -x noise
+- remove references to static dmraid/multipath binaries (#453987)
+- translation updates: lv
+
 * Fri Jun 20 2008 Bill Nottingham <notting@redhat.com> - 8.78-1
 - fix mounting of /dev/pts
 
