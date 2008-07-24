@@ -6,12 +6,15 @@ Version: 8.76.2
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}.6
+Release: 1%{?dist}.7
 Source: initscripts-%{version}.tar.bz2
 Patch0: olpc-initscripts.patch
 Patch1: olpc-autologin.patch
 Patch2: initscripts-8.76.2-readonly.patch
 Patch3: initscripts-8.76.2-prettyboot.patch
+Patch4: olpc-xstartup.patch
+Patch5: olpc-runlevel.patch
+Patch6: olpc-setolpckeys.patch
 BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -57,6 +60,13 @@ deactivate most network interfaces.
 %patch1 -p1 
 %patch2 -p1 -b .readonly
 %patch3 -p1 -b .prettyboot
+%patch4 -p1 -b .xstartup
+%patch5 -p1 -b .runlevel
+%patch6 -p1 -b .setolpckeys
+# clean up patch backup files which would otherwise get copied into the
+# RPM.
+rm -f udev/rules.d/*.prettyboot udev/rules.d/*.setolpckeys
+rm -f event.d/*.xstartup
 
 %build
 make
@@ -246,6 +256,17 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %changelog
+* Wed Jul 23 2008 C. Scott Ananian <cscott@laptop.org> - 8.76.2-1.7
+- Unfreeze DCON after failed X start, and fail more quickly when there
+  are problems.
+- Change default runlevel to 5 (replacing an uglier patch to do this
+  in our image creation tool).
+- Remove a redundant udev console initialization which causes the
+  screen to flash during prettyboot (dlo trac #3569).  This replaces
+  an uglier patch to do this in our image creation tool.
+- Set up keymap when hal sees an OLPC keyboard.  This replaces an
+  uglier patch in our image creation tool.
+
 * Sat Jun 28 2008 C. Scott Ananian <cscott@laptop.org> - 8.76.2-1.6
 - Turn on graphical boot by default to generate proper rhgb messages for
   pretty boot.

@@ -50,3 +50,19 @@ diff -ruHp initscripts-8.76.2.orig/rc.d/rc.sysinit initscripts-8.76.2/rc.d/rc.sy
  
  # Load other user-defined modules
  for file in /etc/sysconfig/modules/*.modules ; do
+diff -ruHp initscripts-8.76.2.orig/udev/rules.d/10-console.rules initscripts-8.76.2/udev/rules.d/10-console.rules
+--- initscripts-8.76.2.orig/udev/rules.d/10-console.rules	2008-07-24 12:26:56.000000000 -0400
++++ initscripts-8.76.2/udev/rules.d/10-console.rules	2008-07-24 12:29:15.000000000 -0400
+@@ -1,5 +1,11 @@
+ # Console initialization - keyboard, font, etc.
+-KERNEL=="tty0",		RUN+="/lib/udev/console_init %k"
++# OLPC: commented out to remove tty0 udev initialization, which takes
++#       place during pretty boot and makes the screen flash (dlo trac #3569).
++#       We set up the console ourselves, both in
++#       96-olpc-keyboard.rules as well as in olpc-configure, and we
++#       set the appropriate font in /etc/init.d/z-boot-anim-stop -- so
++#       this is completely unnecessary.
++#KERNEL=="tty0",		RUN+="/lib/udev/console_init %k"
+ 
+ # Check and set up serial and serial-like consoles if necessary
+ KERNEL=="console",	RUN+="/lib/udev/console_check %k"
