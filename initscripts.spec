@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.79
+Version: 8.80
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -46,6 +46,17 @@ The initscripts package contains the basic system scripts used to boot
 your Red Hat or Fedora system, change runlevels, and shut the system down
 cleanly.  Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
+
+%package -n debugmode
+Summary: Scripts for running in debugging mode
+Requires: initscripts
+Group: System Environment/Base
+
+%description -n debugmode
+The debugmode package contains some basic scripts that are used to run
+the system in a debugging mode.
+
+Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
@@ -119,7 +130,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/network-scripts
 %config(noreplace) %verify(not md5 mtime size) /etc/adjtime
 %config(noreplace) /etc/sysconfig/init
-%config(noreplace) /etc/sysconfig/mcheck
 %config(noreplace) /etc/sysconfig/netconsole
 %config(noreplace) /etc/sysconfig/readonly-root
 /etc/sysconfig/network-scripts/ifdown
@@ -194,6 +204,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/rc.d/rc.local
 %config /etc/rc.d/rc.sysinit
 %config(noreplace) /etc/sysctl.conf
+%exclude /etc/profile.d/debug*
 %config /etc/profile.d/*
 /usr/sbin/sys-unconfig
 /sbin/setsysfont
@@ -237,7 +248,17 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
+%files -n debugmode
+%config(noreplace) /etc/sysconfig/debug
+%config /etc/profile.d/debug*
+
 %changelog
+* Tue Jul 29 2008 Bill Nottingham <notting@redhat.com> - 8.80-1
+- Fix translation typo (#455804, <ruslanpisarev@gmail.com>)
+- Turn off syncookies
+- Cleanups for proper plymouth support
+- Move the mcheck code to a debugmode package, make it more generic
+
 * Mon Jul 14 2008 Bill Nottingham <notting@redhat.com> - 8.79-1
 - fix mcheck stuff to be installed correctly
 - don't do an arping check for loopback interfaces
