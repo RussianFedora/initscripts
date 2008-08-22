@@ -1,5 +1,6 @@
 %define with_upstart 1%{nil} 
 
+
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
 Version: 8.80
