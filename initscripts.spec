@@ -1,8 +1,8 @@
-%define with_upstart 1%{nil} 
+%define with_upstart 1%{nil}
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.81
+Version: 8.82
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -27,7 +27,7 @@ Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/runuser
 Requires: udev >= 115-1
 Requires: popt >= 1.12-2
-Requires: cpio, findutils
+Requires: cpio
 Conflicts: mkinitrd < 4.0, kernel < 2.6.12, mdadm < 2.6.4-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
@@ -253,6 +253,14 @@ rm -rf $RPM_BUILD_ROOT
 %config /etc/profile.d/debug*
 
 %changelog
+* Wed Sep 10 2008 Bill Nottingham <notting@redhat.com> - 8.82-1
+- refresh translation strings
+- plymouth updates. (#460702, <rstrode@redhat.com>)
+- translation updates: fi, lv, no
+- remove duplicate dependency (#465182)
+- ifup-eth: Change how we set the zeroconf route. (#239609)
+- ifup*: Use 0.0.0.0/0, not 0/0. (#460580)
+
 * Fri Aug 29 2008 Bill Nottingham <notting@redhat.com> - 8.81-1
 - rc.sysinit: Don't use -L in find (#458652, #458504, CVE-2008-3524)
 - ifup: kill more code from loopback bringup
