@@ -2,13 +2,14 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.82
+Version: 8.83
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
 Release: 1
-Source: initscripts-%{version}.tar.bz2
-BuildRoot: /%{_tmppath}/%{name}-%{version}-%{release}-root
+URL: http://fedorahosted.org/releases/i/n/initscripts/
+Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
 Requires: /sbin/fuser, /bin/grep
@@ -18,7 +19,6 @@ Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 3.0
 %if with_upstart
 Requires: upstart
-Obsoletes: event-compat-sysv
 %else
 Requires: SysVinit >= 2.85-38
 %endif
@@ -36,9 +36,10 @@ Conflicts: xorg-x11, glib2 < 2.11.1-2
 Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
 # http://bugzilla.redhat.com/show_bug.cgi?id=252973
 Conflicts: nut < 2.2.0
-Obsoletes: rhsound sapinit
 Obsoletes: hotplug
-Prereq: /sbin/chkconfig, /usr/sbin/groupadd, /bin/sed, coreutils
+Requires(pre): /usr/sbin/groupadd
+Requires(post): /sbin/chkconfig, coreutils
+Requires(preun): /sbin/chkconfig
 BuildRequires: glib2-devel popt-devel gettext pkgconfig
 
 %description
@@ -84,7 +85,7 @@ rm -f $RPM_BUILD_ROOT/etc/inittab.*
 rm -f \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-ctc \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv \
- $RPM_BUILD_ROOT/etc/udev/rules.d/55-ccw.rules \
+ $RPM_BUILD_ROOT/lib/udev/rules.d/55-ccw.rules \
  $RPM_BUILD_ROOT/lib/udev/ccw_init
 %else
 rm -f \
@@ -104,11 +105,6 @@ chmod 600 /var/log/btmp
 /sbin/chkconfig --add netfs
 /sbin/chkconfig --add network
 /sbin/chkconfig --add netconsole
-
-# Handle converting prefdm back to respawn
-if fgrep -q "x:5:once:/etc/X11/prefdm -nodaemon" /etc/inittab ; then
-    sed --in-place=.rpmsave 's|^x:5:once:/etc/X11/prefdm -nodaemon|x:5:respawn:/etc/X11/prefdm -nodaemon|g' /etc/inittab
-fi
 
 %preun
 if [ $1 = 0 ]; then
@@ -134,7 +130,7 @@ rm -rf $RPM_BUILD_ROOT
 %config(noreplace) /etc/sysconfig/readonly-root
 /etc/sysconfig/network-scripts/ifdown
 /sbin/ifdown
-%config /etc/sysconfig/network-scripts/ifdown-post
+/etc/sysconfig/network-scripts/ifdown-post
 /etc/sysconfig/network-scripts/ifup
 /sbin/ifup
 %dir /etc/sysconfig/console
@@ -143,44 +139,44 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/sysconfig/networking/devices
 %dir /etc/sysconfig/networking/profiles
 %dir /etc/sysconfig/networking/profiles/default
-%config /etc/sysconfig/network-scripts/network-functions
-%config /etc/sysconfig/network-scripts/network-functions-ipv6
-%config /etc/sysconfig/network-scripts/init.ipv6-global
-%config /etc/sysconfig/network-scripts/ifcfg-lo
-%config /etc/sysconfig/network-scripts/ifup-ipx
-%config /etc/sysconfig/network-scripts/ifup-post
-%config /etc/sysconfig/network-scripts/ifdown-ppp
-%config /etc/sysconfig/network-scripts/ifdown-sl
-%config /etc/sysconfig/network-scripts/ifup-ppp
-%config /etc/sysconfig/network-scripts/ifup-sl
-%config /etc/sysconfig/network-scripts/ifup-routes
-%config /etc/sysconfig/network-scripts/ifdown-routes
-%config /etc/sysconfig/network-scripts/ifup-plip
-%config /etc/sysconfig/network-scripts/ifup-plusb
-%config /etc/sysconfig/network-scripts/ifup-bnep
-%config /etc/sysconfig/network-scripts/ifdown-bnep
-%config /etc/sysconfig/network-scripts/ifup-eth
-%config /etc/sysconfig/network-scripts/ifdown-eth
-%config /etc/sysconfig/network-scripts/ifup-ipv6
-%config /etc/sysconfig/network-scripts/ifdown-ipv6
-%config /etc/sysconfig/network-scripts/ifup-ipsec
-%config /etc/sysconfig/network-scripts/ifdown-ipsec
-%config /etc/sysconfig/network-scripts/ifup-sit
-%config /etc/sysconfig/network-scripts/ifdown-sit
-%config /etc/sysconfig/network-scripts/ifup-tunnel
-%config /etc/sysconfig/network-scripts/ifdown-tunnel
-%config /etc/sysconfig/network-scripts/ifup-aliases
-%config /etc/sysconfig/network-scripts/ifup-ippp
-%config /etc/sysconfig/network-scripts/ifdown-ippp
-%config /etc/sysconfig/network-scripts/ifup-wireless
+/etc/sysconfig/network-scripts/network-functions
+/etc/sysconfig/network-scripts/network-functions-ipv6
+/etc/sysconfig/network-scripts/init.ipv6-global
+/etc/sysconfig/network-scripts/ifcfg-lo
+/etc/sysconfig/network-scripts/ifup-ipx
+/etc/sysconfig/network-scripts/ifup-post
+/etc/sysconfig/network-scripts/ifdown-ppp
+/etc/sysconfig/network-scripts/ifdown-sl
+/etc/sysconfig/network-scripts/ifup-ppp
+/etc/sysconfig/network-scripts/ifup-sl
+/etc/sysconfig/network-scripts/ifup-routes
+/etc/sysconfig/network-scripts/ifdown-routes
+/etc/sysconfig/network-scripts/ifup-plip
+/etc/sysconfig/network-scripts/ifup-plusb
+/etc/sysconfig/network-scripts/ifup-bnep
+/etc/sysconfig/network-scripts/ifdown-bnep
+/etc/sysconfig/network-scripts/ifup-eth
+/etc/sysconfig/network-scripts/ifdown-eth
+/etc/sysconfig/network-scripts/ifup-ipv6
+/etc/sysconfig/network-scripts/ifdown-ipv6
+/etc/sysconfig/network-scripts/ifup-ipsec
+/etc/sysconfig/network-scripts/ifdown-ipsec
+/etc/sysconfig/network-scripts/ifup-sit
+/etc/sysconfig/network-scripts/ifdown-sit
+/etc/sysconfig/network-scripts/ifup-tunnel
+/etc/sysconfig/network-scripts/ifdown-tunnel
+/etc/sysconfig/network-scripts/ifup-aliases
+/etc/sysconfig/network-scripts/ifup-ippp
+/etc/sysconfig/network-scripts/ifdown-ippp
+/etc/sysconfig/network-scripts/ifup-wireless
 /etc/sysconfig/network-scripts/ifup-isdn
 /etc/sysconfig/network-scripts/ifdown-isdn
 /etc/sysconfig/network-scripts/net.hotplug
 %ifarch s390 s390x
-%config /etc/sysconfig/network-scripts/ifup-ctc
-%config /etc/sysconfig/network-scripts/ifup-iucv
+/etc/sysconfig/network-scripts/ifup-ctc
+/etc/sysconfig/network-scripts/ifup-iucv
 %endif
-%config(noreplace) /etc/networks 
+%config(noreplace) /etc/networks
 /etc/rwtab
 %dir /etc/rwtab.d
 /etc/statetab
@@ -188,7 +184,6 @@ rm -rf $RPM_BUILD_ROOT
 %if with_upstart
 %config(noreplace) /etc/event.d/*
 %endif
-/etc/udev/rules.d/*
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
 %dir /etc/rc.d
@@ -199,10 +194,10 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/rc.d/init.d
 /etc/rc.local
 /etc/rc.sysinit
-%config /etc/rc.d/init.d/*
-%config /etc/rc.d/rc
+/etc/rc.d/init.d/*
+/etc/rc.d/rc
 %config(noreplace) /etc/rc.d/rc.local
-%config /etc/rc.d/rc.sysinit
+/etc/rc.d/rc.sysinit
 %config(noreplace) /etc/sysctl.conf
 %exclude /etc/profile.d/debug*
 %config /etc/profile.d/*
@@ -219,6 +214,7 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/securetty
 %attr(2755,root,root) /sbin/netreport
 /sbin/initlog
+/lib/udev/rules.d/*
 /lib/udev/rename_device
 /lib/udev/console_init
 /lib/udev/console_check
@@ -231,13 +227,13 @@ rm -rf $RPM_BUILD_ROOT
 %dir %attr(775,root,root) /var/run/netreport
 %dir /etc/ppp
 %dir /etc/ppp/peers
-%config /etc/ppp/ip-up
-%config /etc/ppp/ip-down
-%config /etc/ppp/ip-up.ipv6to4
-%config /etc/ppp/ip-down.ipv6to4
-%config /etc/ppp/ipv6-up
-%config /etc/ppp/ipv6-down
-%config /etc/initlog.conf
+/etc/ppp/ip-up
+/etc/ppp/ip-down
+/etc/ppp/ip-up.ipv6to4
+/etc/ppp/ip-down.ipv6to4
+/etc/ppp/ipv6-up
+/etc/ppp/ipv6-down
+%config(noreplace) /etc/initlog.conf
 %dir /etc/NetworkManager
 %dir /etc/NetworkManager/dispatcher.d
 /etc/NetworkManager/dispatcher.d/00-netreport
@@ -249,10 +245,28 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
 %files -n debugmode
+%defattr(-,root,root)
 %config(noreplace) /etc/sysconfig/debug
 %config /etc/profile.d/debug*
 
 %changelog
+* Tue Sep 30 2008 Bill Nottingham <notting@redhat.com> - 8.83-1
+- various merge review fixes (#225900)
+  Notably: init scripts/network scripts are no longer %config
+- remove some extraneous device-mapper initialization
+- use pidfile in status before calling pidof (#463205)
+- use plymouth directly, not the rhgb-client wrapper
+- move bridging after bonding (#449950, <djuran@redhat.com>)
+- use alsactl to save sound settings. (#462677, <jkysela@redhat.com>)
+- quit plymouth differently (<rstrode@redhat.com>)
+- make sure we don't try and spawn a repair shell when there's no
+  tty (#463161)
+- move udev rules to /lib
+- stateless updates (#433702, <harald@redhat.com>)
+- call logger with a full path (#447928, <harald@redhat.com>)
+- translation updates: as, bn_IN, ca, cz, de, es, fi, fr, gu, it, ja,
+  lv, mr, nl, or, pa, pl, pt_BR, ru, te, zh_TW
+
 * Wed Sep 10 2008 Bill Nottingham <notting@redhat.com> - 8.82-1
 - refresh translation strings
 - plymouth updates. (#460702, <rstrode@redhat.com>)
@@ -425,7 +439,7 @@ rm -rf $RPM_BUILD_ROOT
 - translation updates: as, bn_IN, bg, ca, cs, de, el, es, fi, gu, hi, it, ja, ko, kn, ml,
   mr, nb, nl, pa, pl, pt, pt_BR, ro, sl, sr, sr@Latn, sv, ta, te, zh_CN
 
-* Wed Aug 29 2007 Bill Nottingham <notting@redhat.com> - 8.56-1 
+* Wed Aug 29 2007 Bill Nottingham <notting@redhat.com> - 8.56-1
 - rename_device: fix open() call
 - rc.sysinit: optimize out some excess greps (<harald@redhat.com>)
 - halt: support newer nut syntax, conflict with old versions (#252973, <tsmetana@redhat.com>)
@@ -555,7 +569,7 @@ rm -rf $RPM_BUILD_ROOT
 - run rc.sysinit, /etc/rc in monitor mode (part of #184340)
 - use a better check for 'native' services (#190989, #110761, adapted
   from <matthias@rpmforge.net>)
-  
+ 
 * Tue Sep 19 2006 Bill Nottingham <notting@redhat.com> 8.41-1
 - fix network ipv6 hang (#207137, others)
 - rc.sysinit: change blkid.tab path to /etc/blkid/blkid.tab
@@ -620,7 +634,7 @@ rm -rf $RPM_BUILD_ROOT
 - ipsec: various fixes & new features (#150682, #168972, <mitr@redhat.com>, <alex@milivojevic.org>)
 - ipsec: add check for IKE_METHOD (#197576, <john_smyth@mail.ru>)
 - rename_device: ignore alias devices, fix race (#186355)
-- ifup/ifdown: don't mark as %config
+- ifup/ifdown: don't mark as %%config
 - rwtab: some additions/cleanup
 
 * Mon Jun 12 2006 Bill Nottingham <notting@redhat.com> 8.35-1
@@ -744,7 +758,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Fri Dec  2 2005 Bill Nottingham <notting@redhat.com> 8.18-1
 - use new dhclient file paths, add appropriate conflict (#169164)
-	
+
 * Wed Oct  5 2005 Bill Nottingham <notting@redhat.com> 8.17-1
 - make sure corefile limiting works for user processes as well
   (#166511, <ville.skytta@iki.fi>)
@@ -849,7 +863,7 @@ rm -rf $RPM_BUILD_ROOT
 - rc.sysinit: fix restorecon invocation (#153100)
 - initlog: free some of the more egregious memory leaks (#85935)
 - initlog: fix potential memory overread (#153685, <in-redhat@baka.org>)
-- remove some conflicts, %post scripts, etc. that were only relelvant
+- remove some conflicts, %%post scripts, etc. that were only relelvant
   for upgrades from pre-7.0
 - other minor fixes, see ChangeLog
 
@@ -900,7 +914,7 @@ rm -rf $RPM_BUILD_ROOT
   for ipv6calc (<pb@bierenger.de>, <pekkas@netcore.fi>)
 - fix quoting in daemon() (#144634)
 - make sysctl be silent (#144483)
-  
+ 
 * Mon Jan  3 2005 Bill Nottingham <notting@redhat.com> 8.02-1
 - remove initlog, minilogd
 - add a flag to kmodule for use with kudzu's socket mode, use it
@@ -923,14 +937,14 @@ rm -rf $RPM_BUILD_ROOT
 - rc.d/init.d/netfs: don't mount GFS (#140281)
 - fix various minilogd bogosities (#106338)
 
-* Mon Nov 15 2004 Karsten Hopp <karsten@redhat.de> 7.97-1 
+* Mon Nov 15 2004 Karsten Hopp <karsten@redhat.de> 7.97-1
 - configure CTC protocol if CTCPROT is set (#133088)
 
 * Mon Nov 15 2004 Bill Nottingham <notting@redhat.com>
 - fix check_link_down to still check negotiation if link is
   listed as "up" on entering (#110164, <dbaron@dbaron.org>)
 
-* Thu Nov 11 2004 Karsten Hopp <karsten@redhat.de> 7.96-1 
+* Thu Nov 11 2004 Karsten Hopp <karsten@redhat.de> 7.96-1
 - parse OPTIONS for QETH, CTC, LCS interfaces (#136256, mainframe)
 
 * Tue Nov  9 2004 Bill Nottingham <notting@redhat.com>
@@ -952,15 +966,15 @@ rm -rf $RPM_BUILD_ROOT
 * Sun Oct 31 2004 Florian La Roche <laroche@redhat.com>
 - /etc/rc.d/rc: use "LC_ALL=C grep" for small speedup
 - /etc/rc.d/rc.sysinit:
-	- do not read udev.conf, this seems to be all in the start_udev script
-	- fix detection of "nomodules" kernel command line option
-	- read /proc/cmdline earlier and convert rhgb to use that, too
-	- load_module(): change redirection to /dev/null
-	- some checks for RHGB_STARTED="" looked strange
+  - do not read udev.conf, this seems to be all in the start_udev script
+  - fix detection of "nomodules" kernel command line option
+  - read /proc/cmdline earlier and convert rhgb to use that, too
+  - load_module(): change redirection to /dev/null
+  - some checks for RHGB_STARTED="" looked strange
 - /etc/sysconfig/network-scripts/ifup-ppp:
-	- remove a call to basename with shell builtins
+  - remove a call to basename with shell builtins
 - /etc/sysconfig/network-scripts/network-functions:
-	- remove some calls to basename/sed with shell builtins
+  - remove some calls to basename/sed with shell builtins
 
 * Wed Oct 27 2004 Bill Nottingham <notting@redhat.com> 7.93.2-1
 - fix prefdm fallback to installed display managers (#137274)
@@ -981,7 +995,7 @@ rm -rf $RPM_BUILD_ROOT
 - ifup-wireless: fix key for open vs. restricted (#135235, <dax@gurulabs.com>)
 - translation updates
 
-* Fri Oct 08 2004 Karsten Hopp <karsten@redhat.de> 7.90-1 
+* Fri Oct 08 2004 Karsten Hopp <karsten@redhat.de> 7.90-1
 - fix portname for LCS devices
 
 * Fri Oct 08 2004 Bill Nottingham <notting@redhat.com>
@@ -994,7 +1008,7 @@ rm -rf $RPM_BUILD_ROOT
 - fix requires
 
 * Tue Oct  5 2004 Dan Walsh <dwalsh@redhat.com> - 7.87-1
-- Change SELinux relabel to not remount / 
+- Change SELinux relabel to not remount /
 
 * Mon Oct  4 2004 Bill Nottingham <notting@redhat.com>
 - use runuser instead of su; require it
@@ -1033,7 +1047,7 @@ rm -rf $RPM_BUILD_ROOT
 - initscripts.spec: require nash (#132513)
 - translation updates
 
-* Tue Sep 14 2004 Karsten Hopp <karsten@redhat.de> 7.81-1 
+* Tue Sep 14 2004 Karsten Hopp <karsten@redhat.de> 7.81-1
 - load iucv device config after /etc/sysconfig/network so that
   GATEWAY doesn't get overwritten
 
@@ -1057,18 +1071,18 @@ rm -rf $RPM_BUILD_ROOT
 - remove triggers for ancient releases, bulletproof remaining ones (#131356)
 
 * Wed Sep  1 2004 Jeremy Katz <katzj@redhat.com> - 7.76-1
-- udev uses UDEV_TMPFS now 
+- udev uses UDEV_TMPFS now
 
-* Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 7.75-1 
+* Wed Sep 01 2004 Karsten Hopp <karsten@redhat.de> 7.75-1
 - fix sysfs configuration of qeth and lcs network interfaces
   (eth, tr, hsi)
 
-* Mon Aug 30 2004 Karsten Hopp <karsten@redhat.de> 7.74-1 
+* Mon Aug 30 2004 Karsten Hopp <karsten@redhat.de> 7.74-1
 - fix support for LCS portnumbers (mainframe)
 
 * Fri Aug 27 2004 Jason Vas Dias  <jvdias@redhat.com> 7.73-1
-- Add support for running the DHCPv6 client to ifup 
-- (new DHCPV6C=yes/no ifcfg-${IF} variable) + update sysconfig.txt 
+- Add support for running the DHCPv6 client to ifup
+- (new DHCPV6C=yes/no ifcfg-${IF} variable) + update sysconfig.txt
 
 * Fri Aug 27 2004 Bill Nottingham <notting@redhat.com> 7.72-1
 - flip the kernel conflict to a Requires:
@@ -1084,8 +1098,8 @@ rm -rf $RPM_BUILD_ROOT
 - rc.sysinit: remove devfs compat and the remaining 2.4 compat
 - ifup-wireless: support multiple keys (#127957)
 - fix firmware loading (#129155, <bnocera@redhat.com>)
-	
-* Tue Aug 24 2004 Karsten Hopp <karsten@redhat.de> 7.68-1 
+ 
+* Tue Aug 24 2004 Karsten Hopp <karsten@redhat.de> 7.68-1
 - execute zfcfconf.sh if available (mainframe)
 
 * Mon Aug 20 2004 Jason Vas Dias <jvdias@redhat.com> 7.67-1
@@ -1104,7 +1118,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Fri Aug 20 2004 Bill Nottingham <notting@redhat.com> 7.64-1
 - rc.d/rc.sysinit: check for dev file too (#130350)
-	
+ 
 * Thu Aug 19 2004 Than Ngo <than@redhat.com> 7.63-1
 - allow CBCP with own number (#125710)
 
@@ -1124,7 +1138,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Aug 11 2004 Jason Vas Dias <jvdias@redhat.com> 7.61-1
 - fix for bug 120093: add PERSISTENT_DHCLIENT option to ifcfg files
 
-* Tue Aug  3 2004 Karsten Hopp <karsten@redhat.de> 7.60-1 
+* Tue Aug  3 2004 Karsten Hopp <karsten@redhat.de> 7.60-1
 - write peerid into sysfs for IUCV devices (mainframe)
 
 * Tue Aug  3 2004 Bill Nottingham <notting@redhat.com>
@@ -1162,7 +1176,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue May 25 2004 Bill Nottingham <notting@redhat.com> 7.57-1
 - readonly root fixes (<alexl@redhat.com>)
 
-* Tue May 25 2004 Karsten Hopp <karsten@redhat.de> 7.56-1 
+* Tue May 25 2004 Karsten Hopp <karsten@redhat.de> 7.56-1
 - special TYPE for qeth devices to differenciate them from ethX
 
 * Mon May 24 2004 Bill Nottingham <notting@redhat.com>
@@ -1172,7 +1186,7 @@ rm -rf $RPM_BUILD_ROOT
 - fix bridging confusing module order (#122848, <luto@myrealbox.com>)
 - rc.d/rc.sysinit: don't mount cifs (#122501)
 
-* Tue May 18 2004 Karsten Hopp <karsten@redhat.de> 7.55-1 
+* Tue May 18 2004 Karsten Hopp <karsten@redhat.de> 7.55-1
 - add support for ccwgroup devices on mainframe
 
 * Thu May 13 2004 Than Ngo <than@redhat.com> 7.54-1
@@ -1372,20 +1386,20 @@ rm -rf $RPM_BUILD_ROOT
 - rc.d/init.d/functions: make strstr() even shorter, remove old
   "case" version that has been already commented out
 - rc.d/rc.sysinit:
-	- no need to set NETWORKING=no, it is not used/exported
-	- do not export BOOTUP
-	- delete two "sleep 1" calls that wants to add time to go
-	  into confirmation mode. There is enough time to press a
-	  key anyway or use "confirm" in /proc/cmdline.
-	- read /proc/cmdline into a variable
-	- use strstr() to search in /proc/cmdline
-	- add "forcefsck" as possible option in /proc/cmdline
-	- while removing lock files, no need to call `basename`
-	- add unamer=`uname -r` and reduce number of forks
-	- do not fork new bash to create /var/log/ksyms.0
+  - no need to set NETWORKING=no, it is not used/exported
+  - do not export BOOTUP
+  - delete two "sleep 1" calls that wants to add time to go
+    into confirmation mode. There is enough time to press a
+    key anyway or use "confirm" in /proc/cmdline.
+  - read /proc/cmdline into a variable
+  - use strstr() to search in /proc/cmdline
+  - add "forcefsck" as possible option in /proc/cmdline
+  - while removing lock files, no need to call `basename`
+  - add unamer=`uname -r` and reduce number of forks
+  - do not fork new bash to create /var/log/ksyms.0
 
 * Thu Apr 03 2003 Karsten Hopp <karsten@redhat.de> 7.15-1
-- Mainframe has no /dev/ttyX devices and no mingetty, don't 
+- Mainframe has no /dev/ttyX devices and no mingetty, don't
   initialize them. This gave error messages during startup
 
 * Mon Mar 17 2003 Nalin Dahyabhai <nalin@redhat.com>
@@ -1540,8 +1554,8 @@ rm -rf $RPM_BUILD_ROOT
 
 * Thu Jul 11 2002 Florian La Roche <Florian.LaRoche@redhat.de>
 - /etc/init.d/functions:
-	daemon(): avoid starting another bash
-	killproc(): avoid starting another bash for the default case
+  daemon(): avoid starting another bash
+  killproc(): avoid starting another bash for the default case
 - do not call "insmod -p" before loading the "st" module
 
 * Tue Jul 09 2002 Florian La Roche <Florian.LaRoche@redhat.de>
@@ -1614,7 +1628,7 @@ rm -rf $RPM_BUILD_ROOT
 - use full path to /sbin/ifconfig (#59457)
 - /sbin/service: change to root directory before staring/stopping;
   also sanitize environment
-		
+
 * Tue Apr 02 2002 Bill Nottingham <notting@redhat.com> 6.61-1
 - when disabling DMA, don't use things in /usr
 
@@ -1665,7 +1679,7 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Oct 29 2001 Than Ngo <than@redhat.com>
 - fix bug in channel bundling if MSN is missed
 - support DEBUG option
-	
+ 
 * Wed Sep 19 2001 Than Ngo <than@redhat.com>
 - don't show user name by DSL connection
 
@@ -1845,7 +1859,7 @@ rm -rf $RPM_BUILD_ROOT
 * Wed Jun 27 2001 Than Ngo <than@redhat.com>
 - fix pap/chap authentication for syncppp
 - support ippp options
-	
+ 
 * Mon Jun 25 2001 Bill Nottingham <notting@redhat.com>
 - add ifup-wireless
 
@@ -1884,8 +1898,8 @@ rm -rf $RPM_BUILD_ROOT
 
 * Wed Apr 25 2001 Florian La Roche <Florian.LaRoche@redhat.de>
 - add further s390 changes:
-	- ifup-iucv
-	- mkkerneldoth.s390
+  - ifup-iucv
+  - mkkerneldoth.s390
 
 * Tue Apr 24 2001 Than Ngo <than@redhat.com>
 - add shutdown UPS into halt (bug #34312)
@@ -2034,7 +2048,7 @@ rm -rf $RPM_BUILD_ROOT
 
 * Tue Nov 21 2000 Karsten Hopp <karsten@redhat.de>
 - changed hdparm section in rc.sysinit to allow different
-  parameters for each disk (if needed) by copying 
+  parameters for each disk (if needed) by copying
   /etc/sysconfig/harddisks to /etc/sysconfig/harddiskhda (hdb,hdc..)
 - fix RFE #20967
 
@@ -2114,22 +2128,22 @@ rm -rf $RPM_BUILD_ROOT
 
 * Thu Jul 13 2000 Bill Nottingham <notting@redhat.com>
 - fix == tests in rc.sysinit
-- more %pretrans tweaks
+- more %%pretrans tweaks
 
 * Thu Jul 13 2000 Jeff Johnson <jbj@redhat.com>
 - test if /etc/rc.d is a symlink already in pre-transaction syscalls.
 
 * Tue Jul 11 2000 Bill Nottingham <notting@redhat.com>
-- implement the %pre with RPM Magic(tm)
+- implement the %%pre with RPM Magic(tm)
 
 * Sat Jul  8 2000 Bill Nottingham <notting@redhat.com>
 - fix it to not follow /etc/rc.d
 
 * Fri Jul  7 2000 Bill Nottingham <notting@redhat.com>
-- fix %pre, again
+- fix %%pre, again
 
 * Thu Jul  6 2000 Bill Nottingham <notting@redhat.com>
-- tweak %pre back to a mv (rpm is fun!)
+- tweak %%pre back to a mv (rpm is fun!)
 - do USB initialization before fsck, so keyboard works if it fails
 
 * Mon Jul  3 2000 Bill Nottingham <notting@redhat.com>
@@ -2142,7 +2156,7 @@ rm -rf $RPM_BUILD_ROOT
 - don't use tail
 
 * Thu Jun 28 2000 Trond Eivind Glomsrød <teg@redhat.com>
-- add support for USB controllers and HID devices 
+- add support for USB controllers and HID devices
   (mice, keyboards)
 
 * Tue Jun 27 2000 Trond Eivind Glomsrød <teg@redhat.com>
@@ -2377,7 +2391,7 @@ rm -rf $RPM_BUILD_ROOT
 - fix swapoff silliness
 
 * Fri Sep 10 1999 Bill Nottingham <notting@redhat.com>
-- chkconfig --del in %preun, not %postun
+- chkconfig --del in %%preun, not %%postun
 - use killall5 in halt
 - swapoff non-/etc/fstab swap
 
@@ -2401,7 +2415,7 @@ rm -rf $RPM_BUILD_ROOT
 - disable magic sysrq by default
 
 * Mon Aug 30 1999 Bill Nottingham <notting@redhat.com>
-- new NFS unmounting from Bill Rugolsky <rugolsky@ead.dsa.com> 
+- new NFS unmounting from Bill Rugolsky <rugolsky@ead.dsa.com>
 - fix ifup-sl/dip confusion
 - more raid startup cleanup
 - make utmp group 22
@@ -2513,7 +2527,7 @@ rm -rf $RPM_BUILD_ROOT
 - set macaddr before bootp
 - zero in the /var/run/utmpx file (gafton)
 - don't set hostname on ppp/slip (kills X)
-			
+ 
 * Wed Mar 17 1999 Bill Nottingham <notting@redhat.com>
 - exit ifup if pump fails
 - fix stupid errors in reading commands from subprocess
@@ -2598,8 +2612,8 @@ rm -rf $RPM_BUILD_ROOT
 - Use /proc/version to find preferred modules.
 - Numerous buglets fixed.
 
-* Sun Jun 07 1998 Erik Troan <ewt@redhat.com> 
-- rc.sysinit looks for bootfile= as well as BOOT_IMAGE to set 
+* Sun Jun 07 1998 Erik Troan <ewt@redhat.com>
+- rc.sysinit looks for bootfile= as well as BOOT_IMAGE to set
   /lib/modules/preferred symlink
 
 * Mon Jun 01 1998 Erik Troan <ewt@redhat.com>
@@ -2686,7 +2700,7 @@ rm -rf $RPM_BUILD_ROOT
 - touch random seed file before chmod'ing it.
 
 * Wed Oct 15 1997 Erik Troan <ewt@redhat.com>
-- run domainname if NISDOMAIN is set 
+- run domainname if NISDOMAIN is set
 
 * Wed Oct 15 1997 Michael K. Johnson <johnsonm@redhat.com>
 - Make the random seed file mode 600.
@@ -2719,7 +2733,7 @@ rm -rf $RPM_BUILD_ROOT
 - Added network-functions to spec file.
 - Added report functionality to usernetctl.
 - Fixed bugs I introduced into usernetctl while adding clone device support.
-- Clean up entire RPM_BUILD_ROOT directory in %clean.
+- Clean up entire RPM_BUILD_ROOT directory in %%clean.
 
 * Mon Sep 29 1997 Michael K. Johnson <johnsonm@redhat.com>
 - Clone device support in network scripts, rc scripts, and usernetctl.
@@ -2746,7 +2760,7 @@ rm -rf $RPM_BUILD_ROOT
 - added support for FORWARD_IPV4 variable
 
 * Thu Sep 11 1997 Donald Barnes <djb@redhat.com>
-- added status function to functions along with better killproc 
+- added status function to functions along with better killproc
   handling.
 - added /sbin/usleep binary (written by me) and man page
 - changed BuildRoot to /var/tmp instead of /tmp
@@ -2789,7 +2803,7 @@ rm -rf $RPM_BUILD_ROOT
 * Tue Mar 18 1997 Erik Troan <ewt@redhat.com>
 - Got rid of xargs dependency in halt script
 - Don't mount /proc twice (unmount it in between)
-- sulogin and filesystem unmounting only happened for a corrupt root 
+- sulogin and filesystem unmounting only happened for a corrupt root
   filesystem -- it now happens when other filesystems are corrupt as well
 
 * Tue Mar 04 1997 Michael K. Johnson <johnsonm@redhat.com>
@@ -2816,5 +2830,5 @@ rm -rf $RPM_BUILD_ROOT
 
 * Fri Feb 07 1997 Erik Troan <ewt@redhat.com>
 - Added usernetctl wrapper for user mode ifup and ifdown's and man page
-- Rewrote ppp and slip kill and retry code 
+- Rewrote ppp and slip kill and retry code
 - Added doexec and man page
