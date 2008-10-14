@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.83
+Version: 8.84
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -200,7 +200,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/rc.d/rc.sysinit
 %config(noreplace) /etc/sysctl.conf
 %exclude /etc/profile.d/debug*
-%config /etc/profile.d/*
+/etc/profile.d/*
 /usr/sbin/sys-unconfig
 /sbin/setsysfont
 /bin/doexec
@@ -247,12 +247,18 @@ rm -rf $RPM_BUILD_ROOT
 %files -n debugmode
 %defattr(-,root,root)
 %config(noreplace) /etc/sysconfig/debug
-%config /etc/profile.d/debug*
+/etc/profile.d/debug*
 
 %changelog
+* Tue Oct 14 2008 Bill Nottingham <notting@redhat.com> - 8.84-1
+- override Arabic, Persian, and Hebrew on the console (<alsadi@ojuba.org>)
+- explicitly run mdadm on boot to catch degraded arrays. (<dledford@redhat.com>)
+- fix setting of console font/map (#458362, <ak@sensi.org>)
+- translations updates: hi, kn, nb, sk, sv, ta
+
 * Tue Sep 30 2008 Bill Nottingham <notting@redhat.com> - 8.83-1
 - various merge review fixes (#225900)
-  Notably: init scripts/network scripts are no longer %config
+  Notably: init scripts/network scripts are no longer %%config
 - remove some extraneous device-mapper initialization
 - use pidfile in status before calling pidof (#463205)
 - use plymouth directly, not the rhgb-client wrapper
