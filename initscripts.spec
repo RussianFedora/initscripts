@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.84
+Version: 8.85
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -25,7 +25,7 @@ Requires: SysVinit >= 2.85-38
 Requires: /sbin/ip, /sbin/arping, net-tools, /bin/find
 Requires: /etc/redhat-release, dev
 Requires: ethtool >= 1.8-2, /sbin/runuser
-Requires: udev >= 115-1
+Requires: udev >= 125-1
 Requires: popt >= 1.12-2
 Requires: cpio
 Conflicts: mkinitrd < 4.0, kernel < 2.6.12, mdadm < 2.6.4-3
@@ -33,7 +33,7 @@ Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
 Conflicts: xorg-x11, glib2 < 2.11.1-2
-Conflicts: alsa-utils < 1.0.14-0.5.rc2.fc7
+Conflicts: alsa-utils < 1.0.18
 # http://bugzilla.redhat.com/show_bug.cgi?id=252973
 Conflicts: nut < 2.2.0
 Obsoletes: hotplug
@@ -250,6 +250,17 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Fri Oct 31 2008 Bill Nottingham <notting@redhat.com> - 8.85-1
+- add some error handling/hiding to netfs NM dispatcher script (#469197)
+- halt: fix code that causes a syntax error on multiple sound cards (#469156)
+- require a new enough udev version to handle where we put the rules
+- exit 0 in /etc/rc.d/rc (#469050)
+- don't set up encrypted devices that have already been set up under different
+  names (#462371, <wwoods@redhat.com>)
+- accept either the '+<addr>', or comma-separated addresses for arp_ip_target. (#467954,
+  <darcy.sherwood@gmail.com>)
+- translation updates: hu, kn, ko, ml, sr, sr@latin
+
 * Tue Oct 14 2008 Bill Nottingham <notting@redhat.com> - 8.84-1
 - override Arabic, Persian, and Hebrew on the console (<alsadi@ojuba.org>)
 - explicitly run mdadm on boot to catch degraded arrays. (<dledford@redhat.com>)
