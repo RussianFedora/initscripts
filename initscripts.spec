@@ -2,11 +2,11 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.89
+Version: 8.90
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2
+Release: 1
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -250,8 +250,16 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.89-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+* Mon Mar  9 2009 Bill Nottingham <notting@redhat.com> - 8.90-1
+- init.d/functions: cgroup support (<jsafrane@redhat.com>)
+- fix various issues with dmraid handling (#485895, <hdegoede@redhat.com>)
+- rc.sysinit: fix typo. (#487926)
+- console_init: loadkeys has a -q option for silent running. Use it.
+- ifup-tunnel: add compatiblity for openNHRP tunnels (#486559, <claude.tompers@ieee.lu>)
+- ccw_init: don't re-init an existing device, it causes errors. (#484411, <jpayne@redhat.com>)
+- netfs: use same kpartx arguments as rc.sysinit
+- don't list mtab in rwtab (#457941)
+- translation updates: fi, de, mai
 
 * Wed Jan 28 2009 Bill Nottingham <notting@redhat.com> - 8.89-1
 - use a leading path when sourcing files (#482826)
