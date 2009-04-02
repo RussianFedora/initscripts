@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.92
+Version: 8.93
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -249,11 +249,11 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Thu Apr  2 2009 Bill Nottingham <notting@redhat.com> - 8.92-1
+* Thu Apr  2 2009 Bill Nottingham <notting@redhat.com> - 8.93-1
 - rc.sysinit: add a disk synchronization point with scsi_wait_scan post-udev (#481470)
 - netfs: drop smbfs support, we don't even ship the module or tools any more
 - setsysfont: honor LC_CTYPE (#487133, <skasal@redhat.com>)
-- prefdm: do fallbackes based on provides of 'service(graphical-login)' (#485751)
+- prefdm: do fallbacks based on provides of 'service(graphical-login)' (#485751)
 - rc.sysinit: handle multiple IP addresses without choking in the stateless code (#443945)
 - rc.sysinit: catch the right error code from checking for passphrases (#483269, <vladis.kletnieks@vt.edu>)
 - prefdm: handle empty /etc/sysconfig/desktop correctly (#480113)
