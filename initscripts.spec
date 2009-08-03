@@ -2,18 +2,18 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.95
+Version: 8.96
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2
+Release: 1
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
 Requires: /sbin/fuser, /bin/grep
-Requires: /sbin/pidof
+Requires: /sbin/pidof, /sbin/blkid
 Requires: module-init-tools
 Requires: util-linux >= 2.10s-11, mount >= 2.11l
 Requires: bash >= 3.0
@@ -87,11 +87,13 @@ rm -f \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-ctc \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv \
  $RPM_BUILD_ROOT/lib/udev/rules.d/55-ccw.rules \
- $RPM_BUILD_ROOT/lib/udev/ccw_init
+ $RPM_BUILD_ROOT/lib/udev/ccw_init \
+ $RPM_BUILD_ROOT/etc/event.d/console
 %else
 rm -f \
  $RPM_BUILD_ROOT/etc/rc.d/rc.sysinit.s390init \
- $RPM_BUILD_ROOT/etc/sysconfig/init.s390
+ $RPM_BUILD_ROOT/etc/sysconfig/init.s390 \
+ $RPM_BUILD_ROOT/etc/event.d/tty[1-6]
 %endif
 
 %pre
@@ -237,7 +239,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/NetworkManager/dispatcher.d
 /etc/NetworkManager/dispatcher.d/00-netreport
 /etc/NetworkManager/dispatcher.d/05-netfs
-%doc sysconfig.txt sysvinitfiles ChangeLog static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING README-event.d
+%doc sysconfig.txt sysvinitfiles static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING README-event.d
 /var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
@@ -249,8 +251,19 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 8.95-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+* Mon Aug  3 2009 Bill Nottingham <notting@redhat.com> - 8.96-1
+- fix up upstart rules for s390(x). (#515222)
+- leave ChangeLog in the tarball only. (#515012)
+- disable netfilter on bridged interfaces. (#512206)
+- assorted shell-related cleanups to ipv6 and other code (<victor.lowther@gmail.com>)
+- use resolv.conf from dracut netboot before setting hostname. (#514801, <wtogami@redhat.com>)
+- ipcalc updates (<victor.lowther@gmail.com>)
+- only use ethtool for link checking; no more mii-tool
+- require /sbin/blkid directly, as it moves between packages (#508413)
+- redirect bash errors on 'unset' to /dev/null. (#482888)
+- fix dmraid partition naming (#501476, <hdegoede@redhat.com>)
+- don't quote upstart signals. (#501155)
+- translation updates: bn_IN, da, es, sk
 
 * Fri May  1 2009 Bill Nottingham <notting@redhat.com> - 8.95-1
 - don't kill runlevel events on subsequent entering of the same runlevel (#498514)
