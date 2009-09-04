@@ -6,7 +6,7 @@ Version: 8.98
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1
+Release: 1.1
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -28,7 +28,7 @@ Requires: ethtool >= 1.8-2, /sbin/runuser
 Requires: udev >= 125-1
 Requires: popt >= 1.12-2
 Requires: cpio
-Conflicts: mkinitrd < 4.0, kernel < 2.6.31, mdadm < 2.6.4-3
+Conflicts: mkinitrd < 4.0, kernel < 2.6.18, mdadm < 2.6.4-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
 Conflicts: dhclient < 3.0.3-7
 Conflicts: tcsh < 6.13-5
@@ -251,6 +251,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Fri Sep  4 2009 Bill Nottingham <notting@redhat.com> - 8.98-1.1
+- tweak kernel conflict
+
 * Wed Sep  2 2009 Bill Nottingham <notting@redhat.com> - 8.98-1
 - sysconfig.txt: doucment DHCP_HOSTNAME (#498052)
 - 88-clock.rules: Use --systz instead of --hctosys. (#517886, #489494)
