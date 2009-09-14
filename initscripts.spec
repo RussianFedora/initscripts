@@ -2,11 +2,11 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.98
+Version: 8.99
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1.1
+Release: 1
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -251,8 +251,10 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Fri Sep  4 2009 Bill Nottingham <notting@redhat.com> - 8.98-1.1
+* Mon Sep 14 2009 Bill Nottingham <notting@redhat.com> - 8.99-1
+- init.d/functions: add a '-l' option to status to pass lock file name (#521772)
 - tweak kernel conflict
+- translation updates: as, bn_IN, de, fr, hi, it, hu, kn, mr, or, pa, pt, ru, te
 
 * Wed Sep  2 2009 Bill Nottingham <notting@redhat.com> - 8.98-1
 - sysconfig.txt: doucment DHCP_HOSTNAME (#498052)
@@ -264,7 +266,7 @@ rm -rf $RPM_BUILD_ROOT
 - sysconfig.txt: clarify docs (#518614)
 - rc.sysinit: don't pretend /selinux is configurable (#518164)
 - assorted ipv6 redundant code deletion
-- translation updates: bn, ca, d, es, fi, fr, gu, hi, it, ja, ko, ml, nb, nl, pl, pt, pt_BR, ru, sr, ta, zh_CN, zh_TW
+- translation updates: bn, ca, de, es, fi, fr, gu, hi, it, ja, ko, ml, nb, nl, pl, pt, pt_BR, ru, sr, ta, zh_CN, zh_TW
 
 * Mon Aug 10 2009 Bill Nottingham <notting@redhat.com> - 8.97-1
 - ipcalc: fix IPv6 address checking (#516319)
