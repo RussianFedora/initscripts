@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 8.99
+Version: 9.03
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -17,8 +17,9 @@ Requires: /sbin/pidof, /sbin/blkid
 Requires: module-init-tools
 Requires: util-linux-ng >= 2.16, mount >= 2.11l
 Requires: bash >= 3.0
+Requires: sysvinit-tools >= 2.87
 %if with_upstart
-Requires: upstart
+Requires: upstart >= 0.6.0
 %else
 Requires: SysVinit >= 2.85-38
 %endif
@@ -74,26 +75,21 @@ make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandi
 
 %if with_upstart
  mv -f $RPM_BUILD_ROOT/etc/inittab.upstart $RPM_BUILD_ROOT/etc/inittab
- rm -f $RPM_BUILD_ROOT/etc/rc.d/rc1.d/S99single
- rm -f $RPM_BUILD_ROOT/etc/rc.d/init.d/single
 %else
  mv -f $RPM_BUILD_ROOT/etc/inittab.sysv $RPM_BUILD_ROOT/etc/inittab
- rm -rf $RPM_BUILD_ROOT/etc/event.d
+ rm -rf $RPM_BUILD_ROOT/etc/init
 %endif
 rm -f $RPM_BUILD_ROOT/etc/inittab.*
 
 %ifnarch s390 s390x
 rm -f \
  $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-ctc \
- $RPM_BUILD_ROOT/etc/sysconfig/network-scripts/ifup-iucv \
  $RPM_BUILD_ROOT/lib/udev/rules.d/55-ccw.rules \
- $RPM_BUILD_ROOT/lib/udev/ccw_init \
- $RPM_BUILD_ROOT/etc/event.d/console
+ $RPM_BUILD_ROOT/lib/udev/ccw_init
 %else
 rm -f \
  $RPM_BUILD_ROOT/etc/rc.d/rc.sysinit.s390init \
- $RPM_BUILD_ROOT/etc/sysconfig/init.s390 \
- $RPM_BUILD_ROOT/etc/event.d/tty[1-6]
+ $RPM_BUILD_ROOT/etc/sysconfig/init.s390
 %endif
 
 %pre
@@ -175,7 +171,6 @@ rm -rf $RPM_BUILD_ROOT
 /etc/sysconfig/network-scripts/net.hotplug
 %ifarch s390 s390x
 /etc/sysconfig/network-scripts/ifup-ctc
-/etc/sysconfig/network-scripts/ifup-iucv
 %endif
 %config(noreplace) /etc/networks
 /etc/rwtab
@@ -183,7 +178,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/statetab
 %dir /etc/statetab.d
 %if with_upstart
-%config(noreplace) /etc/event.d/*
+/etc/init/*
 %endif
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
@@ -204,7 +199,6 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/*
 /usr/sbin/sys-unconfig
 /sbin/setsysfont
-/bin/doexec
 /bin/ipcalc
 /bin/usleep
 %attr(4755,root,root) /usr/sbin/usernetctl
@@ -214,7 +208,6 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/getkey
 /sbin/securetty
 %attr(2755,root,root) /sbin/netreport
-/sbin/initlog
 /lib/udev/rules.d/*
 /lib/udev/rename_device
 /lib/udev/console_init
@@ -234,12 +227,11 @@ rm -rf $RPM_BUILD_ROOT
 /etc/ppp/ip-down.ipv6to4
 /etc/ppp/ipv6-up
 /etc/ppp/ipv6-down
-%config(noreplace) /etc/initlog.conf
 %dir /etc/NetworkManager
 %dir /etc/NetworkManager/dispatcher.d
 /etc/NetworkManager/dispatcher.d/00-netreport
 /etc/NetworkManager/dispatcher.d/05-netfs
-%doc sysconfig.txt sysvinitfiles static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING README-event.d
+%doc sysconfig.txt sysvinitfiles static-routes-ipv6 ipv6-tunnel.howto ipv6-6to4.howto changes.ipv6 COPYING README-init
 /var/lib/stateless
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
@@ -251,6 +243,40 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Wed Dec  9 2009 Bill Nottingham <notting@redhat.com> - 9.03-1
+- migrate to upstart 0.6.x (<notting@redhat.com>, <plautrba@redhat.com>)
+-- jobs move to /etc/init
+-- collapse rcX and ttyX jobs into single job definitions
+-- jobs are no longer %%config
+- remove obsolete doexec command
+- rc.sysinit: handle yet another random return string from dmraid
+- remove never-used 'sulogin' upstart event
+- fix time-setting udev rules for old-style RTC devices (#537595)
+- init.d/network: keep error codes limited to '1'. (#537841)
+- add initial ifup/ifdown man pages. (#529328, <plautrba@redhat.com>)
+
+* Tue Oct 27 2009 Bill Nottingham <notting@redhat.com> - 9.02-1
+- remove long-since deprecated initlog
+- remove IUCV support (#507217)
+- halt: put a wrapper around killall5 to account for retval 2 not being an error (#526539, <hdegoede@redhat.com>)
+- ifup-eth: honor DEFROUTE=yes|no for 'all' connection types. (#528822)
+- network-functions: load bonding driver if BONDING_OPTS is defined. (#516569)
+- rc.sysinit: put /dev/shm in mtab too, as dracut now mounts it. (#528667)
+
+* Fri Oct  9 2009 Bill Nottingham <notting@redhat.com> - 9.01-1
+- rc.sysinit: fix handling of dmraid output to avoid error messages (#527726, <mschmidt@redhat.com>)
+- rwtab: add /var/lib/xend (#526046)
+- translation updates: fi, nb, pl
+
+* Fri Oct  2 2009 Bill Nottingham <notting@redhat.com> - 9.00-1
+- halt: wrap /sbin/killall5 to catch some return codes (#526539)
+- netfs, netconsle, network: fix return codes to match LSB spec (#524489, #524480, #524486)
+- handle kernels compiled both with and without CONFIG_RTC_HCTOSYS
+- halt: use killall5's return code to avoid unncesssary sleeping (#524359, <hdegoede@redhat.com>)
+- halt: don't kill mdmon on shutdown. (#524357, <hdegoede@redhat.com>)
+- rc.sysinit: do not try and activate ISW raidsets, unless noiswmd is passed. (#524355, <hdegoede@redhat.com>)
+- translation updates: ca, cs, da, mai, po, sv, uk
+
 * Mon Sep 14 2009 Bill Nottingham <notting@redhat.com> - 8.99-1
 - init.d/functions: add a '-l' option to status to pass lock file name (#521772)
 - tweak kernel conflict
