@@ -6,9 +6,10 @@ Version: 9.05
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
+Patch: initscripts-9.05-link.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
 Requires: /sbin/sysctl, syslog
@@ -63,6 +64,7 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
+%patch -p1
 
 %build
 make
