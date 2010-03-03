@@ -2,7 +2,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 9.06
+Version: 9.07
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -10,12 +10,12 @@ Release: 1%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-Requires: mingetty, /bin/awk, /bin/sed, mktemp, e2fsprogs >= 1.15
-Requires: /sbin/sysctl, syslog
+Requires: mingetty, /bin/awk, /bin/sed, mktemp
+Requires: /sbin/sysctl
 Requires: /sbin/fuser, /bin/grep
 Requires: /sbin/pidof, /sbin/blkid
 Requires: module-init-tools
-Requires: util-linux-ng >= 2.16, mount >= 2.11l
+Requires: util-linux-ng >= 2.16
 Requires: bash >= 3.0
 Requires: sysvinit-tools >= 2.87
 %if with_upstart
@@ -24,10 +24,9 @@ Requires: upstart >= 0.6.0
 Requires: SysVinit >= 2.85-38
 %endif
 Requires: /sbin/ip, /sbin/arping, net-tools, /bin/find
-Requires: /etc/redhat-release, dev
-Requires: ethtool >= 1.8-2, /sbin/runuser
+Requires: /etc/redhat-release
+Requires: /sbin/runuser
 Requires: udev >= 125-1
-Requires: popt >= 1.12-2
 Requires: cpio
 Conflicts: mkinitrd < 4.0, kernel < 2.6.18, mdadm < 2.6.4-3
 Conflicts: ypbind < 1.6-12, psacct < 6.3.2-12, kbd < 1.06-19, lokkit < 0.50-14
@@ -37,9 +36,12 @@ Conflicts: xorg-x11, glib2 < 2.11.1-2
 Conflicts: alsa-utils < 1.0.18
 Conflicts: plymouth < 0.7.0-0.2009.02.26
 Conflicts: s390utils < 2:1.8.2-11
+Conflicts: dmraid < 1.0.0.rc16-7
+Conflicts: e2fsprogs < 1.15
 # http://bugzilla.redhat.com/show_bug.cgi?id=252973
 Conflicts: nut < 2.2.0
-Obsoletes: hotplug
+Conflicts: NetworkManager < 1:0.8.0
+Obsoletes: hotplug <= 3:2004_09_23-10.1
 Requires(pre): /usr/sbin/groupadd
 Requires(post): /sbin/chkconfig, coreutils
 Requires(preun): /sbin/chkconfig
@@ -239,6 +241,12 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Wed Mar  3 2010 Bill Nottingham <notting@redhat.com> - 9.07-1
+- clean out some extraneous package requirements
+- fix dmraid error checking now that dmraid has return codes (#568790, others)
+- integrate with NetworkManager for ifup/ifdown (#523064)
+- translation updates: cs, da, de, en_GB, es, fi, nl, pl, pt_BR, ru, sr
+
 * Fri Feb 19 2010 Bill Nottingham <notting@redhat.com> - 9.06-1
 - move ccw_init and ccw udev rules to s390utils (#539491)
 - rc.sysinit: suppress LVM2 warnings.  (#561938, <prajnoha@redhat.com>)
@@ -415,7 +423,7 @@ rm -rf $RPM_BUILD_ROOT
 - event.d/serial: add some docs
 - init.d/functions: __pids_var_run: Handle multi-line pid files correctly (#473287)
 - remove support for no longer existing 'brctl setgcint' command. (#360471)
-- add %config back for ifcfg-lo (#472761)
+- add %%config back for ifcfg-lo (#472761)
 - rcS/rcS-sulogin: don't match commented lines when finding runlevel (#472717)
 - updated translations: de, sk
 
