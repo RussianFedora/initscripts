@@ -7,9 +7,10 @@ Version: 9.16
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
+Patch0: initscripts-9.16-killall_exitcode.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp
 Requires: /sbin/sysctl
@@ -67,6 +68,7 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
+%patch0 -p1 -b .exitcode
 
 %build
 make
@@ -243,6 +245,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Mon Aug 09 2010 Adam Williamson <awilliam@redhat.com> - 9.16-2
+- return exit code 0 after killall (upstream commits 677fbac75b7517a4e20a65d555e3d33c37af79a4 and ce28b8c214c0b4eb7bb35dda38ae5f451b7c1c56)
+
 * Tue Jul 27 2010 Bill Nottingham <notting@redhat.com> - 9.16-1
 - halt: don't umount cgroups (#612789)
 - rename_device: dequote DEVICE key, handle SUBCHANNELS (<harald@redhat.com>)

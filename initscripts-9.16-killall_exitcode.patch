@@ -1,0 +1,22 @@
+From 677fbac75b7517a4e20a65d555e3d33c37af79a4 Mon Sep 17 00:00:00 2001
+From: Bill Nottingham <notting@redhat.com>
+Date: Mon, 2 Aug 2010 12:43:38 -0400
+Subject: [PATCH] exit with a zero return code. (#605519)
+
+---
+ rc.d/init.d/killall |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/rc.d/init.d/killall b/rc.d/init.d/killall
+index c1169b1..e4e08bd 100755
+--- a/rc.d/init.d/killall
++++ b/rc.d/init.d/killall
+@@ -32,3 +32,4 @@ for i in /var/lock/subsys/* ; do
+ 		rm -f "$i"
+ 	fi
+ done
++exit 0
+-- 
+1.5.5.6
+
+
