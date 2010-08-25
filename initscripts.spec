@@ -1,16 +1,14 @@
-
 %define with_upstart 1%{nil}
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 9.16
+Version: 9.17
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2%{?dist}
+Release: 1%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
-Patch0: initscripts-9.16-killall_exitcode.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp
 Requires: /sbin/sysctl
@@ -68,7 +66,6 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
-%patch0 -p1 -b .exitcode
 
 %build
 make
@@ -245,8 +242,14 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Mon Aug 09 2010 Adam Williamson <awilliam@redhat.com> - 9.16-2
-- return exit code 0 after killall (upstream commits 677fbac75b7517a4e20a65d555e3d33c37af79a4 and ce28b8c214c0b4eb7bb35dda38ae5f451b7c1c56)
+* Wed Aug 25 2010 Bill Nottingham <notting@redhat.com> - 9.17-1
+- init.d/functions: redirect start/stop/condrestart/etc to systemctl in a systemd environment (#612728)
+- rc.sysinit: don't frob the console loglevel on boot (#621257, #626572)
+- service: use systemctl on systemd services
+- 10-console.rules: only init consoles on add, not change (<lennart@poettering.net>)
+- halt: fix unmounting bind mounts (#620461, <phr@doc.ic.ac.uk>)
+- killall: exit 0 (#605519)
+- translation updates: de, es, fi, fr, nl, pl, sv, uk
 
 * Tue Jul 27 2010 Bill Nottingham <notting@redhat.com> - 9.16-1
 - halt: don't umount cgroups (#612789)
