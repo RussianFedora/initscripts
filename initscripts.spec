@@ -1,12 +1,14 @@
-%define with_upstart 1%{nil}
+%define _with_upstart 1
+%define _with_systemd 1
+%define _with_sysvinit 0
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 9.17
+Version: 9.18
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2%{?dist}
+Release: 1%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -18,9 +20,15 @@ Requires: module-init-tools
 Requires: util-linux-ng >= 2.16
 Requires: bash >= 3.0
 Requires: sysvinit-tools >= 2.87
-%if with_upstart
-Requires: upstart >= 0.6.0
-%else
+Requires: sysvinit-userspace
+%if %{_with_upstart}
+Conflicts: upstart < 0.6.0
+%endif
+%if %{_with_systemd}
+Conflicts: systemd < 9-3
+Conflicts: systemd-units < 9-3
+%endif
+%if %{_with_sysvinit}
 Requires: SysVinit >= 2.85-38
 %endif
 Requires: /sbin/ip, /sbin/arping, net-tools, /bin/find
@@ -46,7 +54,6 @@ Requires(pre): /usr/sbin/groupadd
 Requires(post): /sbin/chkconfig, coreutils
 Requires(preun): /sbin/chkconfig
 BuildRequires: glib2-devel popt-devel gettext pkgconfig
-Patch0: cgroup.diff
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -67,7 +74,6 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 make
@@ -78,11 +84,20 @@ make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandi
 
 %find_lang %{name}
 
-%if with_upstart
+%if %{_with_systemd}
+ mv -f $RPM_BUILD_ROOT/etc/inittab.systemd $RPM_BUILD_ROOT/etc/inittab
+%endif
+%if %{_with_upstart}
  mv -f $RPM_BUILD_ROOT/etc/inittab.upstart $RPM_BUILD_ROOT/etc/inittab
-%else
+%endif
+%if %{_with_sysvinit}
  mv -f $RPM_BUILD_ROOT/etc/inittab.sysv $RPM_BUILD_ROOT/etc/inittab
+%endif
+%if ! %{_with_upstart}
  rm -rf $RPM_BUILD_ROOT/etc/init
+%endif
+%if ! %{_with_systemd}
+ rm -rf $RPM_BUILD_ROOT/etc/systemd $RPM_BUILD_ROOT/lib/systemd
 %endif
 rm -f $RPM_BUILD_ROOT/etc/inittab.*
 
@@ -107,6 +122,11 @@ chmod 600 /var/log/btmp
 /sbin/chkconfig --add netfs
 /sbin/chkconfig --add network
 /sbin/chkconfig --add netconsole
+%if %{_with_systemd}
+if [ $1 -eq 1 ]; then
+        /bin/systemctl daemon-reload > /dev/null 2>&1 || :
+fi
+%endif
 
 %preun
 if [ $1 = 0 ]; then
@@ -119,6 +139,14 @@ fi
 /sbin/chkconfig --del random
 /sbin/chkconfig --del rawdevices
 exit 0
+
+%if %{_with_systemd}
+%postun
+if [ $1 -ge 1 ]; then
+	/bin/systemctl daemon-reload > /dev/null 2>&1 || :
+fi
+%endif
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -180,8 +208,12 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/rwtab.d
 /etc/statetab
 %dir /etc/statetab.d
-%if with_upstart
+%if %{_with_upstart}
 /etc/init/*
+%endif
+%if %{_with_systemd}
+%config(noreplace) /etc/systemd/system/*
+/lib/systemd/system/*
 %endif
 %config /etc/X11/prefdm
 %config(noreplace) /etc/inittab
@@ -244,8 +276,10 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Thu Aug 26 2010 Bill Nottingham <notting@redhat.com> - 9.17-2
-- halt: fix umount on halt for new cgroup location. (#612789)
+* Fri Sep  3 2010 Bill Nottingham <notting@redhat.com> - 9.18-1
+- fix for new cgroups location (#612789, others <plautrba@redhat.com>)
+- add in basic systemd units
+- translation updates: nb, pt, sv
 
 * Wed Aug 25 2010 Bill Nottingham <notting@redhat.com> - 9.17-1
 - init.d/functions: redirect start/stop/condrestart/etc to systemctl in a systemd environment (#612728)
