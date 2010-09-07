@@ -4,7 +4,7 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 9.18
+Version: 9.19
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
@@ -97,7 +97,7 @@ make ROOT=$RPM_BUILD_ROOT SUPERUSER=`id -un` SUPERGROUP=`id -gn` mandir=%{_mandi
  rm -rf $RPM_BUILD_ROOT/etc/init
 %endif
 %if ! %{_with_systemd}
- rm -rf $RPM_BUILD_ROOT/etc/systemd $RPM_BUILD_ROOT/lib/systemd
+ rm -rf $RPM_BUILD_ROOT/lib/systemd
 %endif
 rm -f $RPM_BUILD_ROOT/etc/inittab.*
 
@@ -212,7 +212,6 @@ rm -rf $RPM_BUILD_ROOT
 /etc/init/*
 %endif
 %if %{_with_systemd}
-%config(noreplace) /etc/systemd/system/*
 /lib/systemd/system/*
 %endif
 %config /etc/X11/prefdm
@@ -276,6 +275,11 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Tue Sep  7 2010 Bill Nottingham <notting@redhat.com> - 9.19-1
+- fix packaging of prefdm, rc-local systemd units (#630952)
+- systemd/single.service: conflict with shutdown.target (#630935)
+- translation updates: ja, pt_BR, ru
+
 * Fri Sep  3 2010 Bill Nottingham <notting@redhat.com> - 9.18-1
 - fix for new cgroups location (#612789, others <plautrba@redhat.com>)
 - add in basic systemd units
