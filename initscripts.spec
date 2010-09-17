@@ -8,7 +8,7 @@ Version: 9.21
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -20,7 +20,7 @@ Requires: module-init-tools
 Requires: util-linux-ng >= 2.16
 Requires: bash >= 3.0
 Requires: sysvinit-tools >= 2.87-5
-Requires: sysvinit-userspace
+#Requires: sysvinit-userspace
 %if %{_with_upstart}
 Conflicts: upstart < 0.6.0
 %if ! %{_with_systemd}
