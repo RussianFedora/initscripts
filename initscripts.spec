@@ -8,7 +8,7 @@ Version: 9.21
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -281,6 +281,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Wed Sep 29 2010 jkeating - 9.21-3
+- Rebuilt for gcc bug 634757
+
 * Fri Sep 17 2010 Bill Nottingham <notting@redhat.com> - 9.21-1
 - build for systemd only
 - ship a default.target link in case the one in /etc gets deleted
