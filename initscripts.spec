@@ -8,7 +8,7 @@ Version: 9.21
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 3%{?dist}
+Release: 4%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -115,6 +115,8 @@ rm -f \
  $RPM_BUILD_ROOT/etc/rc.d/rc.sysinit.s390init \
  $RPM_BUILD_ROOT/etc/sysconfig/init.s390
 %endif
+
+rm -f /lib/systemd/system/default.target
 
 %pre
 /usr/sbin/groupadd -g 22 -r -f utmp
@@ -281,6 +283,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Thu Oct  7 2010 Bill Nottingham <notting@redhat.com> - 9.21-4
+- nuke default.target (conflcit with systemd)
+
 * Wed Sep 29 2010 jkeating - 9.21-3
 - Rebuilt for gcc bug 634757
 
