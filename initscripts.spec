@@ -4,11 +4,11 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 9.21
+Version: 9.22
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 5%{?dist}
+Release: 1%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -20,7 +20,6 @@ Requires: module-init-tools
 Requires: util-linux-ng >= 2.16
 Requires: bash >= 3.0
 Requires: sysvinit-tools >= 2.87-5
-#Requires: sysvinit-userspace
 %if %{_with_upstart}
 Conflicts: upstart < 0.6.0
 %if ! %{_with_systemd}
@@ -28,8 +27,8 @@ Requires: upstart-sysvinit
 %endif
 %endif
 %if %{_with_systemd}
-Conflicts: systemd < 9-3
-Conflicts: systemd-units < 9-3
+Conflicts: systemd < 12-1
+Conflicts: systemd-units < 12-1
 %if ! %{_with_upstart}
 Requires: systemd-sysvinit
 %endif
@@ -66,6 +65,15 @@ The initscripts package contains the basic system scripts used to boot
 your Red Hat or Fedora system, change runlevels, and shut the system down
 cleanly.  Initscripts also contains the scripts that activate and
 deactivate most network interfaces.
+
+%package legacy
+Summary: Support for legacy booting methods
+Requires: initscripts = %{version}-%{release}
+Group: System Environment/Base
+
+%description legacy
+The initscripts-legacy package contains basic scripts that may be
+required to boot the system using older init systems
 
 %package -n debugmode
 Summary: Scripts for running in debugging mode
@@ -115,8 +123,6 @@ rm -f \
  $RPM_BUILD_ROOT/etc/rc.d/rc.sysinit.s390init \
  $RPM_BUILD_ROOT/etc/sysconfig/init.s390
 %endif
-
-rm -f $RPM_BUILD_ROOT/lib/systemd/system/default.target
 
 %pre
 /usr/sbin/groupadd -g 22 -r -f utmp
@@ -220,6 +226,7 @@ rm -rf $RPM_BUILD_ROOT
 /etc/init/*
 %endif
 %if %{_with_systemd}
+/lib/systemd/*
 /lib/systemd/system/*
 %endif
 %config /etc/X11/prefdm
@@ -227,15 +234,15 @@ rm -rf $RPM_BUILD_ROOT
 %dir /etc/rc.d
 %dir /etc/rc.d/rc[0-9].d
 %config(missingok) /etc/rc.d/rc[0-9].d/*
+%exclude /etc/rc.d/rc[0-9].d/*reboot
+%exclude /etc/rc.d/rc[0-9].d/*halt
 /etc/rc[0-9].d
-/etc/rc
 %dir /etc/rc.d/init.d
 /etc/rc.local
-/etc/rc.sysinit
 /etc/rc.d/init.d/*
-/etc/rc.d/rc
+%exclude /etc/rc.d/init.d/halt
+%exclude /etc/rc.d/init.d/reboot
 %config(noreplace) /etc/rc.d/rc.local
-/etc/rc.d/rc.sysinit
 %config(noreplace) /etc/sysctl.conf
 %exclude /etc/profile.d/debug*
 /etc/profile.d/*
@@ -252,6 +259,8 @@ rm -rf $RPM_BUILD_ROOT
 /sbin/sushell
 %attr(2755,root,root) /sbin/netreport
 /lib/udev/rules.d/*
+%exclude /lib/udev/rules.d/10-console.rules
+%exclude /lib/udev/rules.d/88-clock.rules
 /lib/udev/rename_device
 /lib/udev/console_init
 /lib/udev/console_check
@@ -277,17 +286,37 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
 
+%files legacy
+%defattr(-,root,root)
+%config(noreplace) /etc/inittab
+%dir /etc/rc.d
+%dir /etc/rc.d/rc[0-9].d
+%config(missingok) /etc/rc.d/rc[0-9].d/*
+/etc/rc[0-9].d
+/etc/rc
+%dir /etc/rc.d/init.d
+/etc/rc.sysinit
+/etc/rc.d/init.d/*
+/etc/rc.d/rc
+/etc/rc.d/rc.sysinit
+/lib/udev/rules.d/*
+
 %files -n debugmode
 %defattr(-,root,root)
 %config(noreplace) /etc/sysconfig/debug
 /etc/profile.d/debug*
 
 %changelog
-* Thu Oct  7 2010 Bill Nottingham <notting@redhat.com> - 9.21-5
-- nuke default.target (conflcit with systemd)
-
-* Wed Sep 29 2010 jkeating - 9.21-3
-- Rebuilt for gcc bug 634757
+* Tue Nov 16 2010 Bill Nottingham <notting@redhat.com> - 9.22-1
+- merge in systemd-specific startup support; package a -legacy package
+  (based on work by <harald@redhat.com>)
+- init-ipv6.global: don't load sit module on shutdown. (#654098, <ejsheldrake@gmail.com>)
+- do not call rhgb-client
+- network-functions: add infiniband mapping (#648524, <monis@voltaire.com>)
+- fix ifdown nmcli invocation (#612934, jklimes@redhat.com>)
+- *ipv6*: don't use obsolete /sbin/ip wrapper
+- sysconfig.txt: adjust clock docs (#637058)
+- lang.csh: fix tcsh + grep-2.7. (#636552)
 
 * Fri Sep 17 2010 Bill Nottingham <notting@redhat.com> - 9.21-1
 - build for systemd only
