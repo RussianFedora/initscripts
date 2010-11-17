@@ -1,0 +1,120 @@
+commit 48da8e510bca624516172aa144b48a850f0e4ac9
+Author: Bill Nottingham <notting@redhat.com>
+Date:   Tue Nov 16 22:18:58 2010 -0500
+
+    Don't use our crypto init ; systemd handles this.
+
+diff --git a/systemd/fedora-init-crypto b/systemd/fedora-init-crypto
+deleted file mode 100755
+index 79d18be..0000000
+--- a/systemd/fedora-init-crypto
++++ /dev/null
+@@ -1,5 +0,0 @@
+-#!/bin/sh
+-
+-. /etc/init.d/functions
+-
+-init_crypto $1 || :
+diff --git a/systemd/fedora-storage-init b/systemd/fedora-storage-init
+index 0e3a417..b01a465 100755
+--- a/systemd/fedora-storage-init
++++ b/systemd/fedora-storage-init
+@@ -36,5 +36,3 @@ fi
+ if [ -x /sbin/lvm ]; then
+ 	action $"Setting up Logical Volume Management:" /sbin/lvm vgchange -a y --sysinit
+ fi
+-
+-[ -f /etc/crypttab ] && init_crypto 0
+diff --git a/systemd/system/fedora-autoswap.service b/systemd/system/fedora-autoswap.service
+index 8cd881d..d7f667d 100644
+--- a/systemd/system/fedora-autoswap.service
++++ b/systemd/system/fedora-autoswap.service
+@@ -3,8 +3,8 @@ Description=Enable all detected swap partitions
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+ Before=shutdown.target emergency.service emergency.target
+-After=local-fs.target fedora-init-crypto-3.service
+-Requires=local-fs.target fedora-init-crypto-3.service
++After=local-fs.target
++Requires=local-fs.target
+ 
+ [Service]
+ ExecStart=/lib/systemd/fedora-autoswap
+diff --git a/systemd/system/fedora-init-crypto-1.service b/systemd/system/fedora-init-crypto-1.service
+deleted file mode 100644
+index 6d6b732..0000000
+--- a/systemd/system/fedora-init-crypto-1.service
++++ /dev/null
+@@ -1,15 +0,0 @@
+-[Unit]
+-Description=Initialize encrypted storage
+-DefaultDependencies=no
+-Conflicts=shutdown.target
+-Before=shutdown.target emergency.service emergency.target
+-After=fedora-wait-storage.service
+-Requires=fedora-wait-storage.service
+-ConditionPathExists=/etc/crypttab
+-
+-[Service]
+-ExecStart=/lib/systemd/fedora-init-crypto 0
+-Type=oneshot
+-TimeoutSec=0
+-RemainAfterExit=yes
+-StandardInput=tty
+diff --git a/systemd/system/fedora-init-crypto-2.service b/systemd/system/fedora-init-crypto-2.service
+deleted file mode 100644
+index c01bbd1..0000000
+--- a/systemd/system/fedora-init-crypto-2.service
++++ /dev/null
+@@ -1,15 +0,0 @@
+-[Unit]
+-Description=Initialize encrypted filesystems on top of other storage
+-DefaultDependencies=no
+-Conflicts=shutdown.target
+-Before=shutdown.target emergency.service emergency.target
+-After=fedora-storage-init.service
+-Requires=fedora-storage-init.service
+-ConditionPathExists=/etc/crypttab
+-
+-[Service]
+-ExecStart=/lib/systemd/fedora-init-crypto 0
+-Type=oneshot
+-TimeoutSec=0
+-RemainAfterExit=yes
+-StandardInput=tty
+diff --git a/systemd/system/fedora-init-crypto-3.service b/systemd/system/fedora-init-crypto-3.service
+deleted file mode 100644
+index 84b11fd..0000000
+--- a/systemd/system/fedora-init-crypto-3.service
++++ /dev/null
+@@ -1,15 +0,0 @@
+-[Unit]
+-Description=Initialize encrypted filesystems on top of other storage
+-DefaultDependencies=no
+-Conflicts=shutdown.target
+-Before=shutdown.target emergency.service emergency.target
+-After=systemd-random-seed-load.service
+-Requires=systemd-random-seed-load.service
+-ConditionPathExists=/etc/crypttab
+-
+-[Service]
+-ExecStart=/lib/systemd/fedora-init-crypto 1
+-Type=oneshot
+-TimeoutSec=0
+-RemainAfterExit=yes
+-StandardInput=tty
+diff --git a/systemd/system/fedora-storage-init.service b/systemd/system/fedora-storage-init.service
+index 2806c2d..bd8e02f 100644
+--- a/systemd/system/fedora-storage-init.service
++++ b/systemd/system/fedora-storage-init.service
+@@ -3,8 +3,8 @@ Description=Initialize storage subsystems (RAID, LVM, etc.)
+ DefaultDependencies=no
+ Conflicts=shutdown.target
+ Before=shutdown.target local-fs.target emergency.service emergency.target
+-After=fedora-wait-storage.service fedora-init-crypto-1.service
+-Requires=fedora-wait-storage.service fedora-init-crypto-1.service
++After=fedora-wait-storage.service
++Requires=fedora-wait-storage.service
+ 
+ [Service]
+ ExecStart=/lib/systemd/fedora-storage-init

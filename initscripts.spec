@@ -8,7 +8,7 @@ Version: 9.22
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}
+Release: 2%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -59,6 +59,7 @@ Requires(pre): /usr/sbin/groupadd
 Requires(post): /sbin/chkconfig, coreutils
 Requires(preun): /sbin/chkconfig
 BuildRequires: glib2-devel popt-devel gettext pkgconfig
+Patch: 48da8e5.patch
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -88,6 +89,7 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
+%patch -p1
 
 %build
 make
@@ -307,6 +309,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Tue Nov 16 2010 Bill Nottingham <notting@redhat.com> - 9.22-2
+- remove our own crypttab services in favor of systemd's
+
 * Tue Nov 16 2010 Bill Nottingham <notting@redhat.com> - 9.22-1
 - merge in systemd-specific startup support; package a -legacy package
   (based on work by <harald@redhat.com>)
