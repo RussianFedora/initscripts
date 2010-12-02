@@ -4,11 +4,11 @@
 
 Summary: The inittab file and the /etc/init.d scripts
 Name: initscripts
-Version: 9.22
+Version: 9.23
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2%{?dist}
+Release: 1%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -59,7 +59,6 @@ Requires(pre): /usr/sbin/groupadd
 Requires(post): /sbin/chkconfig, coreutils
 Requires(preun): /sbin/chkconfig
 BuildRequires: glib2-devel popt-devel gettext pkgconfig
-Patch: 48da8e5.patch
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -89,7 +88,6 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
-%patch -p1
 
 %build
 make
@@ -287,6 +285,8 @@ rm -rf $RPM_BUILD_ROOT
 %ghost %attr(0600,root,utmp) /var/log/btmp
 %ghost %attr(0664,root,utmp) /var/log/wtmp
 %ghost %attr(0664,root,utmp) /var/run/utmp
+%dir /etc/tmpfiles.d
+/etc/tmpfiles.d/initscripts.conf
 
 %files legacy
 %defattr(-,root,root)
@@ -309,8 +309,12 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
-* Tue Nov 16 2010 Bill Nottingham <notting@redhat.com> - 9.22-2
-- remove our own crypttab services in favor of systemd's
+* Thu Dec 02 2010 Bill Nottingham <notting@redhat.com> - 9.23-1
+- don't throw errors on unreadable /dev/stderr (#650103, <plautrba@redhat.com>)
+- support multiple ipv4 addresses, not just alias devices (#132912, #633984, <jklimes@redhat.com>)
+- properly handle /var/run on tmpfs (#656602, <plautrba@redhat.com>)
+- allow '0' as a vlan tag (#624704, #635360)
+- assorted systemd unit cleanup (<lennart@poettering.net>)
 
 * Tue Nov 16 2010 Bill Nottingham <notting@redhat.com> - 9.22-1
 - merge in systemd-specific startup support; package a -legacy package
