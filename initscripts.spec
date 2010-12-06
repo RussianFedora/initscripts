@@ -60,6 +60,8 @@ Requires(post): /sbin/chkconfig, coreutils
 Requires(preun): /sbin/chkconfig
 BuildRequires: glib2-devel popt-devel gettext pkgconfig
 
+Patch0: diff
+
 %description
 The initscripts package contains the basic system scripts used to boot
 your Red Hat or Fedora system, change runlevels, and shut the system down
@@ -88,6 +90,7 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 make
@@ -309,6 +312,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Mon Dec 06 2010 Bill Nottingham <notting@redhat.com> - 9.23-2
+- fix routing regression (#660363)
+
 * Thu Dec 02 2010 Bill Nottingham <notting@redhat.com> - 9.23-1
 - don't throw errors on unreadable /dev/stderr (#650103, <plautrba@redhat.com>)
 - support multiple ipv4 addresses, not just alias devices (#132912, #633984, <jklimes@redhat.com>)
