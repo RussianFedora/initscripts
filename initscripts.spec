@@ -8,7 +8,7 @@ Version: 9.23
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 2%{?dist}
+Release: 3%{?dist}
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -61,6 +61,7 @@ Requires(preun): /sbin/chkconfig
 BuildRequires: glib2-devel popt-devel gettext pkgconfig
 
 Patch0: diff
+Patch1: 0001-add-as-a-valid-character-in-network-device-names.patch
 
 %description
 The initscripts package contains the basic system scripts used to boot
@@ -91,6 +92,7 @@ Currently, this consists of various memory checking code.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p1
 
 %build
 make
@@ -312,6 +314,9 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Fri Dec 17 2010 Bill Nottingham <notting@redhat.com> - 9.23-3
+- accept '#' in ethernet device names (#663904, <matt_domsch@dell.com>)
+
 * Mon Dec 06 2010 Bill Nottingham <notting@redhat.com> - 9.23-2
 - fix routing regression (#660363)
 
