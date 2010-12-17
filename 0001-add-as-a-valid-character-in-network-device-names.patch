@@ -1,0 +1,25 @@
+From 30df66aeada5bf7987c31443f02d624bf0ef9215 Mon Sep 17 00:00:00 2001
+From: Matt Domsch <Matt_Domsch@dell.com>
+Date: Fri, 17 Dec 2010 09:54:29 -0600
+Subject: [PATCH] add # as a valid character in network device names
+
+---
+ rc.d/init.d/network |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/rc.d/init.d/network b/rc.d/init.d/network
+index 482bb7b..b31060b 100755
+--- a/rc.d/init.d/network
++++ b/rc.d/init.d/network
+@@ -46,7 +46,7 @@ cd /etc/sysconfig/network-scripts
+ interfaces=$(ls ifcfg* | \
+ 	    LANG=C sed -e "$__sed_discard_ignored_files" \
+ 		       -e '/\(ifcfg-lo$\|:\|ifcfg-.*-range\)/d' \
+-		       -e '/ifcfg-[A-Za-z0-9\._-]\+$/ { s/^ifcfg-//g;s/[0-9]/ &/}' | \
++		       -e '/ifcfg-[A-Za-z0-9#\._-]\+$/ { s/^ifcfg-//g;s/[0-9]/ &/}' | \
+ 	    LANG=C sort -k 1,1 -k 2n | \
+ 	    LANG=C sed 's/ //')
+ rc=0
+-- 
+1.7.3.3
+
