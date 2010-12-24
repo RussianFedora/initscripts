@@ -6,9 +6,11 @@ Version: 9.12.1
 # ppp-watch is GPLv2+, everything else is GPLv2
 License: GPLv2 and GPLv2+
 Group: System Environment/Base
-Release: 1%{?dist}
+Release: 1%{?dist}.1
 URL: http://fedorahosted.org/releases/i/n/initscripts/
 Source: http://fedorahosted.org/releases/i/n/initscripts/initscripts-%{version}.tar.bz2
+Patch1: initscripts-9.05-product.rfr.patch
+Patch2: initscripts-9.12-lxdm.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Requires: mingetty, /bin/awk, /bin/sed, mktemp
 Requires: /sbin/sysctl
@@ -66,6 +68,8 @@ Currently, this consists of various memory checking code.
 
 %prep
 %setup -q
+%patch1 -p1 -b .product.rfr
+%patch2 -p1 -b .lxdm
 
 %build
 make
@@ -241,6 +245,10 @@ rm -rf $RPM_BUILD_ROOT
 /etc/profile.d/debug*
 
 %changelog
+* Fri Jul  2 2010 Arkady L. Shane <ashejn@yandex-team.ru> - 9.12.1-1.1
+- rfremixify
+- added LXDM into prefdm script
+
 * Thu Jun 24 2010 Bill Nottingham <notting@redhat.com> - 9.12.1-1
 - ifup-eth: check for dhclient configuration in /etc/dhcp as well (#607764, #607766)
 - init.d/functions: handle permission denied on reading PID file. (#595597)

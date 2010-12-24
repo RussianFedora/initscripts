@@ -1,0 +1,12 @@
+diff -urN initscripts-9.12.orig/prefdm initscripts-9.12/prefdm
+--- initscripts-9.12.orig/prefdm	2010-05-05 20:20:00.000000000 +0400
++++ initscripts-9.12/prefdm	2010-05-06 13:23:22.962774981 +0400
+@@ -18,6 +18,8 @@
+ 		quit_arg="--retain-splash"
+ 	elif [ "$DISPLAYMANAGER" = WDM ]; then
+ 		preferred=/usr/bin/wdm
++	elif [ "$DISPLAYMANAGER" = LXDE ]; then
++		preferred=/usr/sbin/lxdm
+ 	elif [ "$DISPLAYMANAGER" = XDM ]; then
+ 	        preferred=/usr/bin/xdm
+         elif [ -n "$DISPLAYMANAGER" ]; then
